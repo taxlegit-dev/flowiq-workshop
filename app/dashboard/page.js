@@ -1,8 +1,10 @@
 "use client";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UC, compute, findingsOf, freshState, impactOf, inr, seedMeta } from "@/lib/engine";
-import { AgeingChart, AreaChart } from "@/components/Charts";
+import { UC, compute, findingsOf, freshState, impactOf, inr, projected, seedFull, seedMeta } from "@/lib/engine";
+import Overview from "@/components/Overview";
+import UcAnalysis from "@/components/UcAnalysis";
+import FindingPanel from "@/components/FindingPanel";
 
 const days = (n) => `${Number(n).toFixed(1)} days`;
 const MAX_EMAILS = 15;
@@ -31,6 +33,7 @@ function Dashboard() {
   const [user, setUser] = useState(null);
   const [state, setState] = useState(null);
   const [tab, setTab] = useState("UC1");
+  const [view, setView] = useState("overview");
   const [open, setOpen] = useState(null);      // finding being approved
   const [editing, setEditing] = useState(false);
   const [toast, setToast] = useState("");
@@ -61,17 +64,18 @@ function Dashboard() {
   const base = useMemo(() => state && compute({ ...state, approved: {} }), [state]);
   const now = useMemo(() => state && compute(state), [state]);
   const list = useMemo(() => state && findingsOf(state), [state]);
+  const proj = useMemo(() => state && projected(state), [state]);
 
   if (!state || !now) return null;
 
   const K = now.kpi, B = base.kpi;
   const tiles = [
+    { k: "atStake", l: "At stake", v: inr(K.atStake), d: K.atStake - B.atStake, good: -1, sub0: `${K.total - K.done} open items` },
     { k: "cash", l: "Cash & bank", v: inr(K.cash), d: K.cash - B.cash, good: 1 },
-    { k: "receivables", l: "Receivables", v: inr(K.receivables), d: K.receivables - B.receivables, good: -1 },
     { k: "dso", l: "DSO", v: days(K.dso), d: K.dso - B.dso, good: -1, fmt: (x) => `${x > 0 ? "+" : "−"}${Math.abs(x).toFixed(1)} days` },
     { k: "overdue", l: "Overdue from customers", v: inr(K.overdue), d: K.overdue - B.overdue, good: -1 },
     { k: "value", l: "Saved & risk stopped", v: inr(K.value), d: K.value - B.value, good: 1 },
-    { k: "done", l: "Actions approved", v: `${K.done} / ${K.total}`, d: 0, sub: `${inr(K.atStake)} still at stake` },
+    { k: "done", l: "Actions approved", v: `${K.done} / ${K.total}`, d: 0, sub: K.done ? `${inr(B.atStake - K.atStake)} actioned` : "Waiting for you" },
   ];
 
   function applyApproval(ids, verb) {
@@ -83,7 +87,7 @@ function Dashboard() {
     const after = compute(next).kpi;
     setState(next);
     const changed = {};
-    for (const k of ["cash", "receivables", "dso", "overdue", "value", "done"]) if (Math.abs(after[k] - before[k]) > 0.01) changed[k] = 1;
+    for (const k of ["atStake", "cash", "receivables", "dso", "overdue", "value", "done"]) if (Math.abs(after[k] - before[k]) > 0.01) changed[k] = 1;
     setFlash(changed); setTimeout(() => setFlash({}), 1600);
     const parts = [];
     if (after.cash > before.cash) parts.push(`Cash +${inr(after.cash - before.cash)}`);
@@ -173,7 +177,7 @@ function Dashboard() {
         <section className="kpis">
           {tiles.map((t) => {
             const dir = t.d === 0 ? "" : (t.d * t.good > 0 ? "up" : "down");
-            const txt = t.sub || (Math.abs(t.d) < 0.05 ? "No change yet" : t.fmt ? t.fmt(t.d) : `${t.d > 0 ? "+" : "−"}${inr(Math.abs(t.d))}`);
+            const txt = t.sub || (Math.abs(t.d) < 0.05 ? (t.sub0 || "No change yet") : t.fmt ? t.fmt(t.d) : `${t.d > 0 ? "+" : "−"}${inr(Math.abs(t.d))}`);
             return (
               <div key={t.k} className={`kpi ${flash[t.k] ? "flash" : ""}`}>
                 <div className="l">{t.l}</div>
@@ -184,18 +188,21 @@ function Dashboard() {
           })}
         </section>
 
-        <section className="grid2">
-          <div className="card">
-            <div className="hd"><h3>Customer dues by days overdue</h3><span className="hint">Not yet due: {inr(now.ageing.find((b) => b.bucket === "Not due")?.amount)}</span></div>
-            <AgeingChart data={now.ageing.filter((b) => b.bucket !== "Not due")} maxY={Math.max(...base.ageing.filter((b) => b.bucket !== "Not due").map((b) => b.amount), 1) * 1.08} />
-          </div>
-          <div className="card">
-            <div className="hd"><h3>Money at stake by area</h3>
-              <span className="legend"><span><i style={{ background: "var(--open)" }} />Open</span><span><i style={{ background: "var(--resolved)" }} />Resolved</span></span></div>
-            <AreaChart data={now.areas} />
-          </div>
-        </section>
+        <div className="status">
+          <span><i className="dot" />Synced from Tally {seedFull.sync.date}</span>
+          <span>{seedFull.sync.vouchers.toLocaleString("en-IN")} vouchers read</span>
+          <span>Data health {seedFull.sync.health}/100</span>
+          <span>Books to {seedMeta.asOf}</span>
+        </div>
 
+        <nav className="views" role="tablist">
+          <button className="view" aria-pressed={view === "overview"} onClick={() => setView("overview")}>Overview</button>
+          <button className="view" aria-pressed={view === "hub"} onClick={() => setView("hub")}>Action Hub <span className="c">{K.total - K.done}</span></button>
+        </nav>
+
+        {view === "overview" && <Overview state={state} now={now} base={base} proj={proj} onOpen={(f) => setOpen(f)} />}
+
+        {view === "hub" && (
         <section className="card">
           <div className="hd">
             <div className="tabs" role="tablist">
@@ -206,7 +213,9 @@ function Dashboard() {
             </div>
             {openInTab > 1 && <button className="btn ghost sm" onClick={approveAll}>Approve all {openInTab}</button>}
           </div>
-          <p className="ucnote"><b>{UC[tab].name}.</b> Edit an amount to see its effect, then approve.</p>
+          <h3 className="ucname">{UC[tab].name}</h3>
+          <UcAnalysis uc={tab} state={state} />
+          <p className="ucnote">Open a finding to see its analysis before you approve. Edit an amount to see its effect.</p>
           <div className="list">
             {rows.map((f) => {
               const done = !!state.approved[f.id];
@@ -214,62 +223,25 @@ function Dashboard() {
                 <div key={f.id} className={`row ${done ? "done" : ""}`}>
                   <span className={`sev ${f.severity}`} title={f.severity} />
                   <div><div className="p">{f.party}</div><div className="a">{f.action}</div></div>
-                  <div className="t">{f.title.startsWith(f.party + ":") ? f.title.slice(f.party.length + 1).trim() : f.title}</div>
+                  <button className="t tlink" onClick={() => setOpen(f)}>{f.title.startsWith(f.party + ":") ? f.title.slice(f.party.length + 1).trim() : f.title}</button>
                   <input className="amt num" aria-label={`Amount for ${f.party}`} value={Number(f.amount).toLocaleString("en-IN")}
                     onChange={(e) => editAmount(f, e.target.value)} disabled={done} />
                   <div className="acts">
                     {done ? <button className="btn ghost sm" onClick={() => undo(f)}>Undo</button>
-                      : <button className="btn sm" onClick={() => setOpen(f)}>Approve</button>}
+                      : <button className="btn sm" onClick={() => setOpen(f)}>Review</button>}
                   </div>
                 </div>
               );
             })}
           </div>
         </section>
+        )}
         <p className="foot">Sample company data. Emails go only to your own address{user.email ? ` (${user.email})` : ""}.</p>
       </main>
 
-      {open && <ApproveModal f={open} state={state} onClose={() => setOpen(null)} onApprove={approve} demo={demo} mobile={user.mobile} />}
+      {open && <FindingPanel f={open} state={state} onClose={() => setOpen(null)} onApprove={approve} demo={demo} waOk={!demo && !!waLink(user.mobile, open)} email={user.email} />}
       {editing && <EditDrawer state={state} setState={setState} onClose={() => setEditing(false)} />}
       {toast && <div className="toast" role="status">{toast}</div>}
-    </>
-  );
-}
-
-function ApproveModal({ f, state, onClose, onApprove, demo, mobile }) {
-  const [test, setTest] = useState(!demo);
-  const canWa = !demo && !!waLink(mobile, f);
-  const [wa, setWa] = useState(false);
-  const b = compute(state).kpi, a = compute(state, f.id).kpi;
-  const i = impactOf(f, state.inputs);
-  const chips = [];
-  if (i.cash) chips.push(`Cash +${inr(i.cash)}`);
-  if (a.dso < b.dso - 0.05) chips.push(`DSO ${b.dso.toFixed(1)} → ${a.dso.toFixed(1)} days`);
-  if (a.overdue < b.overdue) chips.push(`Overdue −${inr(b.overdue - a.overdue)}`);
-  if (i.saved) chips.push(`Saved ${inr(i.saved)}`);
-  if (i.protect) chips.push(`Risk stopped ${inr(i.protect)}`);
-  return (
-    <>
-      <div className="scrim" onClick={onClose} />
-      <div className="modal" role="dialog" aria-label="Approve action">
-        <div className="mh"><h2>{f.action}</h2><button className="x" onClick={onClose} aria-label="Close">×</button></div>
-        <dl className="kv">
-          <dt>Party</dt><dd>{f.party}</dd>
-          <dt>Found</dt><dd>{f.title}</dd>
-          <dt>Amount</dt><dd className="num">{inr(f.amount, true)}</dd>
-        </dl>
-        <div className="l" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}>When you approve</div>
-        <div className="impact">{chips.length ? chips.map((c) => <span key={c} className="chip">{c}</span>) : <span className="chip">Recorded for follow-up</span>}</div>
-        {f.body && <details className="draft"><summary>Message FlowIQ will send</summary><pre>{f.subject ? `Subject: ${f.subject}\n\n` : ""}{f.body}</pre></details>}
-        <div className="mf">
-          <div className="opts">
-            {f.body && <label><input type="checkbox" checked={test} disabled={demo} onChange={(e) => setTest(e.target.checked)} />Email me a test copy</label>}
-            {canWa && <label><input type="checkbox" checked={wa} onChange={(e) => setWa(e.target.checked)} />Send to my WhatsApp</label>}
-          </div>
-          <button className="btn ghost" onClick={onClose}>Cancel</button>
-          <button className="btn" onClick={() => onApprove(f, test && !!f.body, wa && canWa)}>Approve</button>
-        </div>
-      </div>
     </>
   );
 }

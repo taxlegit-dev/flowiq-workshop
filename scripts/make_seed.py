@@ -38,6 +38,22 @@ def days_of(f):
             return int(m.groups()[-1])
     return 0
 
+def clean(x):
+    return PHONE.sub("[mobile]", EMAIL.sub("[email]", str(x or ""))).strip()
+
+def pr(f):
+    return c["prepared"].get(f["finding_id"]) or {}
+
+def table_of(a):
+    t = a.get("table") or {}
+    if not t.get("columns"): return None
+    return {"columns": [clean(x) for x in t["columns"]], "rows": [[clean(x) for x in r] for r in t.get("rows", [])][:25]}
+
+def evidence_of(p):
+    e = p.get("evidence") or {}
+    real = e.get("real") or {}
+    return {"label": e.get("label") or "", "found": {k: v[:6] for k, v in real.items()}, "missing": e.get("missing") or []}
+
 findings = []
 for f in c["findings"]:
     a = (c["prepared"].get(f["finding_id"]) or {}).get("action") or {}
@@ -49,6 +65,19 @@ for f in c["findings"]:
         "action": WHAT.get(t, f["recommended_action"]), "kind": KIND.get(t, "protect"),
         "amount": round(float(f["amount_at_stake"] or 0)), "days": days_of(f),
         "why": f.get("evidence_summary", "")[:300],
+        "owner": f.get("owner_role") or "",
+        "root": f.get("root_cause_hypothesis") or "",
+        "rule": f.get("rule_id_triggered") or "",
+        "refs": f.get("voucher_refs") or "",
+        "sla": int(float(f.get("sla_days") or 0)),
+        "checks": [{"check": clean(i.get("check")), "result": clean(i.get("result")), "source": i.get("source") or ""}
+                   for i in (pr(f).get("investigation") or [])],
+        "table": table_of(a),
+        "review": clean(((pr(f).get("review") or {}).get("reason")) or ""),
+        "evidence": evidence_of(pr(f)),
+        "after": clean(a.get("after")), "closure": clean(a.get("closure")),
+        "automation": clean(a.get("automation")), "followup": a.get("followup_days") or 0,
+        "label": clean(a.get("type_label")) or WHAT.get(t, ""),
         "subject": a.get("subject", ""), "body": body,
     })
 
@@ -62,8 +91,19 @@ seed = {
         "interestRate": 12,
     },
     "ageing": [{"bucket": b["bucket"], "amount": round(b["amount"])} for b in c["ageing"]["buckets"]],
-    "monthly": [{"m": r["period"], "sales": round(r["sales"]), "receipts": round(r["receipts"])} for r in c["monthly"]],
+    "monthly": [{"m": r["period"], "sales": round(r["sales"]), "receipts": round(r["receipts"]),
+                 "purchases": round(r["purchase"]), "payments": round(r["payments"])} for r in c["monthly"]],
+    "position": {k: (round(p[k], 1) if k in ("dso", "dpo", "ccc") else round(p[k])) for k in
+                 ("revenue", "receivables", "payables", "advances_to_vendors", "cash_bank", "duties_taxes_net",
+                  "working_capital", "dso", "dpo", "ccc")} | {"period_from": p["period_from"], "days": p["days"]},
+    "sync": {"date": (c.get("sync") or {}).get("last_success_at") or c["health"]["sync_date"],
+             "vouchers": next((int(x["detail"].split()[0]) for x in c["health"]["checks"] if x["check"] == "row_count_vouchers"), 0),
+             "health": c["health"]["score"]},
     "findings": findings,
+    "dropped": [{"uc": d["use_case"], "title": clean(d.get("title")), "reason": clean(d.get("reason")), "amount": round(float(d.get("amount") or 0))}
+                for d in (c.get("review") or {}).get("dropped", [])],
+    "playbooks": {k: {"name": v.get("name", ""), "steps": [clean(x) for x in v.get("investigate", [])], "verify": clean(v.get("verify"))}
+                  for k, v in (c.get("playbooks") or {}).items()},
 }
 json.dump(seed, open(out, "w"), ensure_ascii=False, indent=1)
 print(len(findings), "findings;", sum(1 for f in findings if f["body"]), "with drafts")
