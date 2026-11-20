@@ -1,7 +1,8 @@
 # FlowIQ Automation · Workshop app (Next.js)
 
 - **/** Welcome page and form. Each submission is saved to the **FlowIQ Workshop Contacts** Google Sheet through that sheet's own Apps Script web app.
-- **/dashboard** All 8 use cases on Vardhan Home & Industrial sample data. It has editable numbers, live KPIs and charts, approvals that show their impact, test copies, and **Send MIS report** by email (Brevo).
+- **/dashboard** Three sample companies, picked from the dropdown in the header: Vardhan Home & Industrial (UC1–UC8), Kaveri Pumps & Valves (40 use cases, UC1–UC42 except UC9/UC35) and Aanya Kitchen & Home (UC9 Amazon reconciliation). Editable numbers, live KPIs and charts, the analysis behind every finding, approvals that show their impact, and test copies by email / WhatsApp.
+- **Download reports** (header): each company's MIS report (PDF: daily, weekly, monthly) and Actionable report (Excel: weekly, monthly), exactly as built by the FlowIQ Automation pipeline (`report_center.py`). Files live in `public/reports/<company>/`.
 - **/dashboard?demo=1** Rehearsal mode. No sign-in, and no emails are sent.
 
 **Each user is isolated.** Every registration gets its own user ID and its own dashboard. Edited values, approvals and charts are stored only in that user's browser, under that ID, so nothing is shared between users. Two people registering on the same laptop also get separate dashboards; use **Sign out** between them. Emails go only to the address the user registered with, which is guaranteed by a signed session token. Each user can send up to 15 emails.
@@ -63,4 +64,7 @@ DSO = receivables ÷ net sales of the last 90 days × 90. All inputs can be chan
 
 ## Data
 
-`lib/seed.json` is built from the Vardhan FlowIQ output, with every contact removed. To use another company, rebuild it with `scripts/make_seed.py <data.json> lib/seed.json`.
+- `lib/seed.json`: Vardhan (unchanged). `lib/companies/kaveri.json`, `lib/companies/aanya.json`: built from the FlowIQ Automation bundle (`Automation_new/dashboard/data.json`) with `scripts/make_company_seed.py <data.json> <company_id> <out.json>`. Every contact (emails, contact mobiles) is removed.
+- `lib/companies/index.json`: the dropdown list, totals and the report files offered for each company.
+- Each attendee's work is stored per company (`flowiq:state:<user>:<company>`), so switching never mixes records.
+- To add a company: build its JSON with `make_company_seed.py`, copy its `reports/download/*` files into `public/reports/<key>/`, and add it to `lib/companies/index.json` and the loaders in `lib/companies.js`.

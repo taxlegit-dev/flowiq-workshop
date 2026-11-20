@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import seed from "@/lib/seed.json";
+import { COMPANIES } from "@/lib/companies";
 import { inr } from "@/lib/engine";
 
-const AT_STAKE = inr(seed.findings.reduce((t, f) => t + f.amount, 0));
+const AT_STAKE = inr(COMPANIES.reduce((t, c) => t + c.atStake, 0));
+const ISSUES = COMPANIES.reduce((t, c) => t + c.findings, 0);
+const USE_CASES = Math.max(...COMPANIES.map((c) => c.useCases));
 
 export default function Welcome() {
   const router = useRouter();
@@ -38,8 +40,9 @@ export default function Welcome() {
         <h1>Welcome to FlowIQ Automation</h1>
         <p className="tag">Every rupee at risk, found and fixed in one click.</p>
         <div className="hero-stats">
-          <div><b>8</b><span>use cases</span></div>
-          <div><b>{seed.findings.length}</b><span>issues found</span></div>
+          <div><b>{USE_CASES}</b><span>use cases</span></div>
+          <div><b>{COMPANIES.length}</b><span>companies</span></div>
+          <div><b>{ISSUES}</b><span>issues found</span></div>
           <div><b>{AT_STAKE}</b><span>at stake</span></div>
         </div>
       </section>
