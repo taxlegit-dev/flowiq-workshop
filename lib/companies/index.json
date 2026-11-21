@@ -58,7 +58,8 @@
     "covers": "19-Oct-2026 to 17-Nov-2026",
     "built_at": "2026-11-18T05:48:45"
    }
-  ]
+  ],
+  "label": "Vardhan Home & Industrial"
  },
  {
   "key": "kaveri",
@@ -119,7 +120,8 @@
     "covers": "21-Oct-2026 to 19-Nov-2026",
     "built_at": "2026-11-19T12:32:26"
    }
-  ]
+  ],
+  "label": "Kaveri Pumps & Valves (Manufacturing)"
  },
  {
   "key": "aanya",
@@ -180,6 +182,7 @@
     "covers": "20-Oct-2026 to 18-Nov-2026",
     "built_at": "2026-11-18T13:14:34"
    }
-  ]
+  ],
+  "label": "Aanya Kitchen & Home (Ecommerce)"
  }
 ]

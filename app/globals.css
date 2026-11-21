@@ -460,3 +460,4 @@ button { cursor: pointer; }
 .cols-plot { grid-template-rows: 1fr 44px; }
 .cols-y { padding-bottom: 44px; }
 .cols-x span { overflow: visible; text-overflow: clip; word-break: break-word; }
+.sn-sub em.zero, .chip2 em:where(:empty) { opacity: .55; }

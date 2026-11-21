@@ -87,7 +87,7 @@ export default function Overview({ state, now, base, proj, onOpen, onPickUc, fla
       </div>
 
       <div className="ov-row2">
-        <Frame icon={<Icon name="chart" />} label={AREAS ? "Money at stake by area" : "Money at stake by check"} tone="blue" className="grow"
+        <Frame icon={<Icon name="chart" />} label="Money at stake by area" tone="blue" className="grow"
           right={<span className="legend2"><span><i className="lg-ghost" />Faded: at start</span><span><i className="lg-bar" />Solid: open now</span></span>}>
           <div className="ch-head">
             <div><b>{seedFull.company}</b><span>{Object.keys(UC).length} checks · click a bar to open it in the Action Hub</span></div>

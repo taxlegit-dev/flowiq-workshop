@@ -174,7 +174,7 @@ function Dashboard() {
   const initials = (user.name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const UcItem = ({ k }) => (
     <button className="sn-sub" aria-current={view === "hub" && tab === k ? "page" : undefined} onClick={() => pickUc(k)}>
-      <span>{UC[k].short}</span>{ucCount(k) > 0 && <em className="num">{ucCount(k)}</em>}
+      <span>{UC[k].short}</span><em className={`num ${ucCount(k) ? "" : "zero"}`}>{ucCount(k)}</em>
     </button>
   );
 
@@ -185,7 +185,7 @@ function Dashboard() {
         <label className="sn-co">
           <span className="sn-co-ic"><Icon name="building" size={15} /></span>
           <select value={co} onChange={(e) => switchCompany(e.target.value)} aria-label="Company">
-            {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.name}</option>)}
+            {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.label || c.name}</option>)}
           </select>
           <Icon name="chevron" size={14} className="sn-co-ch" />
         </label>
@@ -219,13 +219,6 @@ function Dashboard() {
           <button className="sn-item" onClick={reset}><Icon name="reset" />Reset sandbox</button>
         </nav>
 
-        <div className="sn-card">
-          <div className="sn-card-h"><b>Tally sync</b><span>read-only</span></div>
-          <div className="sn-kv"><span><i className="live" />Last sync</span><b>{seedFull.sync.date}</b></div>
-          <div className="sn-kv"><span><i />Vouchers</span><b className="num">{seedFull.sync.vouchers.toLocaleString("en-IN")}</b></div>
-          <div className="sn-kv"><span><i />Data health</span><b className="num">{seedFull.sync.health}/100</b></div>
-        </div>
-
         <div className="sn-user">
           <span className="av">{initials}</span>
           <div><b>{user.name}</b><span>{user.email || "Demo mode"}</span></div>
@@ -240,7 +233,7 @@ function Dashboard() {
           {view === "hub" && <><Icon name="right" size={13} /><b>{UC[tab]?.short}</b></>}
           <span className="sp" />
           <select className="m-co" value={co} onChange={(e) => switchCompany(e.target.value)} aria-label="Company">
-            {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.name}</option>)}
+            {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.label || c.name}</option>)}
           </select>
         </div>
 
@@ -303,7 +296,7 @@ function Dashboard() {
               right={openInTab > 1 ? <button className="btn ghost xs" onClick={approveAll}>Approve all {openInTab}</button> : <span className="frame-r">{rows.length} items</span>}>
               <div className="fl">
                 <div className="fl-h"><span>Party and action</span><span>What we found</span><span className="r">Amount (₹)</span><span /></div>
-                {rows.length === 0 && <p className="muted fl-empty">Checked - nothing found for this use case.</p>}
+                {rows.length === 0 && <p className="muted fl-empty">No actions for {seedMeta.company} under this use case.</p>}
                 {rows.map((f) => {
                   const done = !!state.approved[f.id];
                   return (

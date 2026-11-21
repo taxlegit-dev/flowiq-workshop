@@ -1,0 +1,329 @@
+{
+ "ucs": [
+  {
+   "uc": "UC1",
+   "name": "Receivables & DSO",
+   "short": "Collections",
+   "method": "Overdue customer bills, ageing and DSO.",
+   "area": "rec"
+  },
+  {
+   "uc": "UC2",
+   "name": "Credit-limit breach",
+   "short": "Credit limits",
+   "method": "Customer exposure versus credit limit set in Tally.",
+   "area": "rec"
+  },
+  {
+   "uc": "UC3",
+   "name": "Overdue + new dispatch",
+   "short": "Dispatch hold",
+   "method": "New sales invoice or delivery to a customer already overdue.",
+   "area": "rec"
+  },
+  {
+   "uc": "UC4",
+   "name": "Duplicate invoice/payment",
+   "short": "Duplicates",
+   "method": "Same supplier bill booked twice, or the same payment made twice.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC5",
+   "name": "Early payment / DPO",
+   "short": "Vendor payments",
+   "method": "Payments made well before the due date (fact only), and interest / penalties / late fees booked.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC6",
+   "name": "GST input credit (purchase register vs GSTR-2B)",
+   "short": "GST credit",
+   "method": "Every purchase bill in Tally matched with the supplier-reported GSTR-2B, bill by bill, month by month.",
+   "area": "gst"
+  },
+  {
+   "uc": "UC7",
+   "name": "PO - receipt note - bill 3-way match",
+   "short": "Purchase match",
+   "method": "Supplier bills checked item by item against the Purchase Order rate and the quantity received on the Receipt Note.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC8",
+   "name": "Customer invoice validation (rejection risk)",
+   "short": "Invoice checks",
+   "method": "Sales invoices checked for what a customer rejects them for - GSTIN, tax type vs place of supply, rate vs sales order / price list.",
+   "area": "rec"
+  },
+  {
+   "uc": "UC9",
+   "name": "Amazon marketplace reconciliation (Tally vs Seller Central)",
+   "short": "Amazon reco",
+   "method": "Every Amazon order, refund, settlement, payout, fee, TCS / TDS credit, Amazon fee invoice and FBA stock movement checked against Tally.",
+   "area": "mkt"
+  },
+  {
+   "uc": "UC10",
+   "name": "Raw-material price variance",
+   "short": "Price variance",
+   "method": "Item purchase rates compared with the item's own history and with other suppliers.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC11",
+   "name": "BOM-driven material reorder",
+   "short": "BOM reorder",
+   "method": "Open sales orders exploded through the bill of materials against stock, open POs and reorder levels.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC12",
+   "name": "Excess / emergency purchasing",
+   "short": "Excess purchase",
+   "method": "Purchases that push stock above the planned cover, and unplanned purchases without a PO at a premium.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC13",
+   "name": "Supplier performance scorecard",
+   "short": "Supplier scorecard",
+   "method": "Each supplier scored on delivery, quality rejections and price movement.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC14",
+   "name": "Quality rejection and debit-note tracking",
+   "short": "QC rejections",
+   "method": "Rejections recorded at QC matched with the debit notes in Tally.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC15",
+   "name": "Job-work material tracking",
+   "short": "Job work",
+   "method": "Material sent to job workers (job-worker godowns) matched with returns and job-work bills.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC16",
+   "name": "Freight and landed-cost check",
+   "short": "Freight",
+   "method": "Freight bills checked against the transporter's rate card and the goods actually received.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC17",
+   "name": "TDS compliance (deduction, deposit, return)",
+   "short": "TDS",
+   "method": "TDS deducted on every payment that attracts it, deposited on time and reported in the return.",
+   "area": "tax"
+  },
+  {
+   "uc": "UC18",
+   "name": "MSME 45-day payment compliance",
+   "short": "MSME 45 days",
+   "method": "Bills of micro / small suppliers paid or outstanding beyond the legal limit.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC19",
+   "name": "Vendor payment run proposal",
+   "short": "Payment run",
+   "method": "A proposed payment list for the coming days, MSME and statutory first, holds and advances applied.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC20",
+   "name": "Supplier advances and excess payments",
+   "short": "Supplier advances",
+   "method": "Advances not adjusted, payments above the bill and supplier ledgers in debit.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC21",
+   "name": "Vendor bank-detail change",
+   "short": "Vendor bank change",
+   "method": "Bank-detail changes on supplier masters followed by payments.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC22",
+   "name": "Duplicate / suspicious suppliers",
+   "short": "Vendor master",
+   "method": "Supplier masters with duplicate identities, missing KYC or links to employees / customers.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC23",
+   "name": "Purchase policy compliance",
+   "short": "Purchase policy",
+   "method": "Bills split under the approval limit, purchases without a PO and POs raised after the bill.",
+   "area": "proc"
+  },
+  {
+   "uc": "UC24",
+   "name": "Supplier statement reconciliation",
+   "short": "Supplier statements",
+   "method": "Supplier statements of account compared with the supplier ledger.",
+   "area": "pay"
+  },
+  {
+   "uc": "UC25",
+   "name": "Capex vs revenue classification",
+   "short": "Capex vs revenue",
+   "method": "Asset purchases charged to expenses and running expenses charged to fixed assets.",
+   "area": "close"
+  },
+  {
+   "uc": "UC26",
+   "name": "Month-end close tracker",
+   "short": "Close tracker",
+   "method": "Close checklist status, with the status of checkable tasks read from the books and the other use cases.",
+   "area": "close"
+  },
+  {
+   "uc": "UC27",
+   "name": "Bank reconciliation",
+   "short": "Bank reco",
+   "method": "Bank ledger in Tally matched with the bank statement.",
+   "area": "close"
+  },
+  {
+   "uc": "UC28",
+   "name": "Production cost and yield variance",
+   "short": "Production variance",
+   "method": "Material used per production batch vs the BOM; scrap vs norm; price variance vs standard cost.",
+   "area": "inv"
+  },
+  {
+   "uc": "UC29",
+   "name": "WIP valuation",
+   "short": "WIP valuation",
+   "method": "Work in progress per the shop-floor register vs the WIP held in the books.",
+   "area": "inv"
+  },
+  {
+   "uc": "UC30",
+   "name": "Inventory valuation and NRV",
+   "short": "Inventory NRV",
+   "method": "Stock valued above net realisable value, non-moving and slow-moving stock.",
+   "area": "inv"
+  },
+  {
+   "uc": "UC31",
+   "name": "Physical vs book stock",
+   "short": "Physical stock",
+   "method": "The physical count sheet compared with book stock by item and godown.",
+   "area": "inv"
+  },
+  {
+   "uc": "UC32",
+   "name": "Overhead absorption",
+   "short": "Overheads",
+   "method": "Factory overheads incurred vs overheads absorbed into production.",
+   "area": "inv"
+  },
+  {
+   "uc": "UC33",
+   "name": "Period-end cut-off - accruals, provisions and prepaids",
+   "short": "Cut-off & accruals",
+   "method": "Recurring expenses missing for the period, goods received not billed, and annual payments charged fully to expense.",
+   "area": "close"
+  },
+  {
+   "uc": "UC34",
+   "name": "Fixed asset register and depreciation",
+   "short": "Fixed assets",
+   "method": "The fixed asset register compared with the books: additions, disposals and depreciation booked.",
+   "area": "close"
+  },
+  {
+   "uc": "UC36",
+   "name": "Suspense and clearing accounts",
+   "short": "Suspense",
+   "method": "Open items in suspense / clearing ledgers.",
+   "area": "close"
+  },
+  {
+   "uc": "UC37",
+   "name": "Journal and ledger review",
+   "short": "Journal review",
+   "method": "Manual journals with risk patterns, and ledgers with the wrong balance nature.",
+   "area": "close"
+  },
+  {
+   "uc": "UC38",
+   "name": "GST output three-way reconciliation",
+   "short": "GST output",
+   "method": "Books vs GSTR-1 vs GSTR-3B: output tax and input credit by month.",
+   "area": "gst"
+  },
+  {
+   "uc": "UC39",
+   "name": "Payroll and statutory dues",
+   "short": "Payroll dues",
+   "method": "Payroll register vs salary bookings; PF / ESI deducted vs deposited and on time.",
+   "area": "tax"
+  },
+  {
+   "uc": "UC40",
+   "name": "Budget vs actual",
+   "short": "Budget vs actual",
+   "method": "Actual expenses by ledger and month against the budget.",
+   "area": "close"
+  },
+  {
+   "uc": "UC41",
+   "name": "Cash flow and working-capital forecast",
+   "short": "Cash forecast",
+   "method": "13-week cash forecast from due dates, open orders and recurring / statutory payments.",
+   "area": "close"
+  },
+  {
+   "uc": "UC42",
+   "name": "Audit and tax-audit preparation",
+   "short": "Audit pack",
+   "method": "A year-to-date audit pack: tax-audit data points from the other use cases and the documents still missing.",
+   "area": "close"
+  }
+ ],
+ "areas": [
+  [
+   "rec",
+   "Receivables"
+  ],
+  [
+   "pay",
+   "Payables"
+  ],
+  [
+   "gst",
+   "GST"
+  ],
+  [
+   "proc",
+   "Procurement"
+  ],
+  [
+   "tax",
+   "TDS & payroll"
+  ],
+  [
+   "inv",
+   "Inventory & costing"
+  ],
+  [
+   "close",
+   "Close & reporting"
+  ],
+  [
+   "mkt",
+   "Marketplace"
+  ],
+  [
+   "more",
+   "More checks"
+  ]
+ ]
+}
