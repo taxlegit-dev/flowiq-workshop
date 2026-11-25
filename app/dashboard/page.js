@@ -3,11 +3,15 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AREAS, UC, compute, findingsOf, freshState, inr, projected, seedFull, seedMeta, selectCompany } from "@/lib/engine";
 import { COMPANIES, DEFAULT_COMPANY, companyMeta, loadCompany, reportUrl } from "@/lib/companies";
-import Overview from "@/components/Overview";
-import UcAnalysis from "@/components/UcAnalysis";
-import FindingPanel from "@/components/FindingPanel";
-import Icon from "@/components/Icon";
-import { Frame } from "@/components/Viz";
+import Hero from "@/components/fx/Hero";
+import Hub from "@/components/fx/Hub";
+import Board from "@/components/fx/Board";
+import CaseFile from "@/components/fx/CaseFile";
+import Palette from "@/components/fx/Palette";
+import Area from "@/components/fx/Area";
+import Impact from "@/components/fx/Impact";
+import { AREA_ICON, Ic, Tip, areaOf, hueOfArea } from "@/components/fx/ui";
+import "./fx.css";
 
 const days = (n) => `${Number(n).toFixed(1)} days`;
 const MAX_EMAILS = 15;
@@ -35,8 +39,12 @@ function Dashboard() {
   const params = useSearchParams();
   const [user, setUser] = useState(null);
   const [state, setState] = useState(null);
-  const [tab, setTab] = useState("UC1");
-  const [view, setView] = useState("overview");
+  const [tab, setTab] = useState("UC1");     // use case for "Approve all"
+  const [view, setView] = useState("hub");
+  const [areaUc, setAreaUc] = useState(null);
+  const [seg, setSeg] = useState("todo");      // Action Hub: needs approval / approved / all
+  const [hubUc, setHubUc] = useState(null);    // Action Hub filter: one check
+  const [kp, setKp] = useState(false);         // search palette
   const [open, setOpen] = useState(null);      // finding being approved
   const [editing, setEditing] = useState(false);
   const [toast, setToast] = useState("");
@@ -71,7 +79,7 @@ function Dashboard() {
     const { key: kk, data } = await loadCompany(k);
     selectCompany(data);
     const t = firstTab();
-    setTab(t); setArea(AREAS ? (AREAS.find((a) => a[2].includes(t)) || AREAS[0])[0] : null);
+    setTab(t); setArea(null); setHubUc(null);
     setOpen(null); setDlOpen(false); setToast(""); setFlash({});
     setState(readState(kk)); setCo(kk);
     try { localStorage.setItem(`flowiq:company:${user.id}`, kk); } catch {}
@@ -140,13 +148,15 @@ function Dashboard() {
   }
 
   function approveAll() {
-    const ids = list.filter((f) => f.uc === tab && !state.approved[f.id]).map((f) => f.id);
+    const u = hubUc || tab;
+    const ids = list.filter((f) => f.uc === u && !state.approved[f.id]).map((f) => f.id);
     if (!ids.length) return;
-    applyApproval(ids, `Approved ${ids.length} × ${UC[tab].short}`);
+    applyApproval(ids, `Approved ${ids.length} × ${UC[u].short}`);
   }
 
   function undo(f) {
     const approved = { ...state.approved }; delete approved[f.id];
+    if (open?.id === f.id) setOpen(null);
     setState({ ...state, approved });
     say(`Undone: ${f.party}`);
   }
@@ -157,197 +167,153 @@ function Dashboard() {
   }
 
   function reset() {
-    if (!window.confirm("Reset your sandbox to the original sample data?")) return;
-    setState({ ...freshState(), co }); say(`${seedMeta.company} reset to the original sample data.`);
+    if (!window.confirm("Reset the dashboard to the figures from the last Tally sync?")) return;
+    setState({ ...freshState(), co }); say(`${seedMeta.company} reset to the last Tally sync.`);
   }
 
-  const rows = list.filter((f) => f.uc === tab).sort((a, b) => (!!state.approved[a.id] - !!state.approved[b.id]) || b.amount - a.amount);
-  const openInTab = rows.filter((f) => !state.approved[f.id]).length;
 
-  const pickUc = (uc) => {
-    setView("hub"); setTab(uc);
-    if (AREAS) setArea((AREAS.find((x) => x[2].includes(uc)) || AREAS[0])[0]);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  // Open the Action Hub (optionally filtered) and bring the list into view, below the green band.
+  const goHub = (s, a, u) => {
+    setView("hub"); if (s) setSeg(s); setArea(a ?? null); setHubUc(u ?? null); if (u) setTab(u);
+    if (typeof window === "undefined") return;
+    const filtered = !!(a || u || (s && s !== "todo"));
+    setTimeout(() => {
+      const el = document.querySelector(".fx-hub");
+      if (filtered && el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 76), behavior: "smooth" });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 30);
   };
-  const ucCount = (k) => now.areas.find((x) => x.uc === k)?.openCount || 0;
+  const goArea = (id, u) => { setView("area"); setArea(id); setAreaUc(u ?? null); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goView = (v) => { setView(v); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const pickUc = (uc) => goHub("todo", areaOf(uc), uc);
+  const onHeroGo = (k) => { if (k === "overview" || k === "impact") { goView(k); return; } goHub(k); };
   const downloads = companyMeta(co).downloads;
   const initials = (user.name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-  const UcItem = ({ k }) => (
-    <button className="sn-sub" aria-current={view === "hub" && tab === k ? "page" : undefined} onClick={() => pickUc(k)}>
-      <span>{UC[k].short}</span><em className={`num ${ucCount(k) ? "" : "zero"}`}>{ucCount(k)}</em>
-    </button>
-  );
+  const openN = K.total - K.done;
+  const areaCount = (ucs) => list.filter((f) => ucs.includes(f.uc) && !state.approved[f.id]).length;
+  const sections = [{ id: "hub", label: "Action Hub", icon: "inbox" }, { id: "impact", label: "Impact report", icon: "trend" }, { id: "overview", label: "Overview", icon: "grid" }]
+    .concat((AREAS || []).map(([id, label]) => ({ id: "area:" + id, label, icon: AREA_ICON[id] || "grid" })));
+  const onSection = (x) => { if (x.id === "hub") goHub("todo"); else if (x.id === "overview" || x.id === "impact") setView(x.id); else goArea(x.id.slice(5)); };
+  const title = view === "overview" ? "Overview" : view === "impact" ? "Impact report" : view === "area" ? (AREAS || []).find((a) => a[0] === area)?.[1] : hubUc ? UC[hubUc]?.name : area ? (AREAS || []).find((a) => a[0] === area)?.[1] : "Action Hub";
 
   return (
-    <div className="app">
-      <aside className="sn" aria-label="Navigation">
-        <div className="sn-brand"><span className="mark" /><b>FlowIQ</b><em>Automation</em></div>
-        <label className="sn-co">
-          <span className="sn-co-ic"><Icon name="building" size={15} /></span>
+    <div className="fx">
+      <aside className="fx-rail" aria-label="Navigation">
+        <div className="fx-mark"><i /><div><b>FlowIQ</b><small>Financial intelligence</small></div></div>
+        <label className="fx-cosw"><span>Company</span>
           <select value={co} onChange={(e) => switchCompany(e.target.value)} aria-label="Company">
             {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.label || c.name}</option>)}
           </select>
-          <Icon name="chevron" size={14} className="sn-co-ch" />
         </label>
-
-        <nav className="sn-nav">
-          <button className="sn-item" aria-current={view === "overview" ? "page" : undefined} onClick={() => setView("overview")}><Icon name="grid" />Overview</button>
-          <button className="sn-item" aria-current={view === "hub" ? "page" : undefined} onClick={() => setView("hub")}>
-            <Icon name="inbox" />Action Hub<span className="badge num">{K.total - K.done}</span>
-          </button>
-          {view === "hub" && (
-            <div className="sn-subs">
-              {AREAS
-                ? AREAS.map(([id, label, ucs]) => (
-                    <div key={id} className="sn-grp">
-                      <div className="sn-grp-h">{label}</div>
-                      {ucs.map((k) => <UcItem key={k} k={k} />)}
-                    </div>
-                  ))
-                : Object.keys(UC).map((k) => <UcItem key={k} k={k} />)}
-            </div>
-          )}
-          <div className="sn-item static"><Icon name="file" />Reports</div>
-          <div className="sn-subs">
-            {downloads.map((d) => (
-              <a key={d.id} className="sn-sub dl-link" href={reportUrl(co, d.filename)} download={d.filename} title={`${d.title} · ${d.covers}`}>
-                <span>{d.format === "pdf" ? "MIS" : "Actionable"} · {d.period}</span><Icon name="download" size={14} />
-              </a>
-            ))}
-          </div>
-          <button className="sn-item" onClick={() => setEditing(true)}><Icon name="sliders" />Edit numbers</button>
-          <button className="sn-item" onClick={reset}><Icon name="reset" />Reset sandbox</button>
+        <nav className="fx-nav">
+          <button className={`fx-tab ${openN ? "hot" : ""}`} aria-current={view === "hub" && !area && !hubUc ? "page" : undefined} onClick={() => goHub()}><Ic n="inbox" />Action Hub<em className="num">{openN}</em></button>
+          <button className="fx-tab" aria-current={view === "impact" ? "page" : undefined} onClick={() => goView("impact")}><Ic n="trend" />Impact report</button>
+          <button className="fx-tab" aria-current={view === "overview" ? "page" : undefined} onClick={() => goView("overview")}><Ic n="grid" />Overview</button>
+          {AREAS && <div className="fx-grpl">Business areas</div>}
+          {(AREAS || []).map(([id, label, ucs]) => {
+            const n = areaCount(ucs);
+            return (
+              <button key={id} className={`fx-tab ${n ? "" : "zero"}`} aria-current={view === "area" && area === id ? "page" : undefined} onClick={() => goArea(id)}>
+                <span className="sw" style={{ background: hueOfArea(id) }}><Ic n={AREA_ICON[id] || "grid"} s={11} /></span>{label}<em className="num">{n}</em>
+              </button>
+            );
+          })}
+          <div className="fx-sep" />
+          <div className="fx-grpl">Reports</div>
+          {downloads.map((d) => (
+            <a key={d.id} className="fx-tab" href={reportUrl(co, d.filename)} download={d.filename} title={`${d.title} · ${d.covers}`}>
+              <Ic n={d.period === "impact" ? "trend" : d.format === "pdf" ? "file" : "report"} />{d.period === "impact" ? "Impact report" : `${d.format === "pdf" ? "MIS" : "Actionable"} · ${d.period}`}<em><Ic n="download" s={13} /></em>
+            </a>
+          ))}
+          <div className="fx-sep" />
+          <button className="fx-tab" onClick={() => setEditing(true)}><Ic n="sliders" />Edit numbers</button>
+          <button className="fx-tab" onClick={reset}><Ic n="reset" />Reset to Tally</button>
         </nav>
-
-        <div className="sn-user">
-          <span className="av">{initials}</span>
-          <div><b>{user.name}</b><span>{user.email || "Demo mode"}</span></div>
-          {!demo && <button className="icon-btn" title="Sign out" aria-label="Sign out" onClick={() => { localStorage.removeItem("flowiq:user"); router.replace("/"); }}><Icon name="logout" /></button>}
+        <div className="fx-foot">
+          <div className="fx-user">
+            <span className="av">{initials}</span>
+            <div><b>{user.name}</b><span>{user.email || "Demo mode, emails off"}</span></div>
+            {!demo && <button className="fx-icon" title="Sign out" aria-label="Sign out" onClick={() => { localStorage.removeItem("flowiq:user"); router.replace("/"); }}><Ic n="logout" /></button>}
+          </div>
+          <div className="fx-note"><b>Live from Tally.</b> Your own workspace. Emails go only to your address{!demo && emails ? ` (${emails}/${MAX_EMAILS} used)` : ""}.</div>
         </div>
       </aside>
 
-      <main className="main">
-        <div className="crumbs">
-          <span>{seedMeta.company}</span><Icon name="right" size={13} />
-          <span>{view === "overview" ? "Overview" : "Action Hub"}</span>
-          {view === "hub" && <><Icon name="right" size={13} /><b>{UC[tab]?.short}</b></>}
-          <span className="sp" />
-          <select className="m-co" value={co} onChange={(e) => switchCompany(e.target.value)} aria-label="Company">
-            {COMPANIES.map((c) => <option key={c.key} value={c.key}>{c.label || c.name}</option>)}
-          </select>
-        </div>
-
-        <header className="page-h">
-          <div>
-            <h1>{view === "overview" ? "Control overview" : UC[tab]?.name}</h1>
-            <p>{view === "overview"
-              ? `${seedMeta.company} · sample data · books to ${seedMeta.asOf} · synced from Tally ${seedFull.sync.date}`
-              : UC[tab]?.na ? `Not applicable to ${seedMeta.company}: ${UC[tab].na}` : "Open a finding to see its analysis before you approve. Edit an amount to see its effect."}</p>
-          </div>
-          <div className="page-act">
-            <div className="seg-sw" role="tablist">
-              <button aria-pressed={view === "overview"} onClick={() => setView("overview")}>Overview</button>
-              <button aria-pressed={view === "hub"} onClick={() => setView("hub")}>Action Hub</button>
-            </div>
-            <div className="dl">
-              <button className="btn sm" onClick={() => setDlOpen(!dlOpen)} aria-expanded={dlOpen}><Icon name="download" size={15} />Download reports</button>
-              {dlOpen && (
-                <div className="dl-menu" role="menu">
-                  {[...new Set(downloads.map((d) => d.group))].map((g) => (
-                    <div key={g} className="dl-group">
-                      <div className="dl-h">{g}</div>
-                      {downloads.filter((d) => d.group === g).map((d) => (
-                        <a key={d.id} className="dl-item" href={reportUrl(co, d.filename)} download={d.filename} onClick={() => setDlOpen(false)}>
-                          <b>{d.title.replace(/^.* - /, "")}</b><span>{d.covers}</span>
-                        </a>
-                      ))}
-                    </div>
-                  ))}
-                  <div className="dl-note">Built by FlowIQ from {seedMeta.company}'s books (Tally, read-only).</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {view === "overview" && <Overview state={state} now={now} base={base} proj={proj} flash={flash} onOpen={(f) => setOpen(f)} onPickUc={pickUc} />}
-
-        {view === "hub" && (
-          <div className="hub">
-            {AREAS && (
-              <div className="chips" role="tablist" aria-label="Area">
-                {AREAS.map(([id, label, ucs]) => {
-                  const n = now.areas.filter((x) => ucs.includes(x.uc)).reduce((t, x) => t + x.openCount, 0);
-                  return <button key={id} className="chip2" aria-pressed={area === id} onClick={() => { setArea(id); setTab(ucs.find((u) => seedFull.findings.some((f) => f.uc === u)) || ucs[0]); }}>{label}<em className="num">{n}</em></button>;
-                })}
+      <div className="fx-stage">
+        <header className="fx-top"><div className="in">
+          <div className="fx-crumb"><h1>{title}</h1><span>{seedMeta.company} · {view === "overview" ? "where the money stands" : view === "impact" ? "what the actions achieved" : view === "area" ? "each check: results, forecast and the actions" : "decisions, approvals and their effect"}</span></div>
+          <button className="fx-kbtn" onClick={() => setKp(true)} aria-label="Search (Ctrl+K)"><Ic n="search" /><span className="lbl">Search parties, findings…</span><kbd>Ctrl K</kbd></button>
+          <div className="fx-menu">
+            <button className="fx-btn pri sm" onClick={() => setDlOpen(!dlOpen)} aria-expanded={dlOpen}><Ic n="download" s={15} /><span className="lbl">Download reports</span></button>
+            {dlOpen && (
+              <div className="fx-pop" role="menu">
+                {[...new Set(downloads.map((d) => d.group))].map((g) => (
+                  <div key={g}>
+                    <div className="h">{g}</div>
+                    {downloads.filter((d) => d.group === g).map((d) => (
+                      <a key={d.id} href={reportUrl(co, d.filename)} download={d.filename} onClick={() => setDlOpen(false)}>{d.title.replace(/^.* - /, "")}<span>{d.covers}</span></a>
+                    ))}
+                  </div>
+                ))}
+                <div className="note">Built by FlowIQ from {seedMeta.company}'s books (Tally, read-only).</div>
               </div>
             )}
-            <div className="chips" role="tablist" aria-label="Use case">
-              {Object.keys(UC).filter((k) => !AREAS || (AREAS.find((x) => x[0] === area)?.[2] || []).includes(k)).map((k) => (
-                <button key={k} className="chip2 sm" aria-pressed={tab === k} onClick={() => setTab(k)}>{UC[k].short}<em className="num">{ucCount(k)}</em></button>
-              ))}
-            </div>
-
-            <Frame icon={<Icon name="layers" />} label="How this check works" right={<span className="frame-r">{UC[tab]?.name}</span>}>
-              <UcAnalysis uc={tab} state={state} />
-            </Frame>
-
-            <Frame icon={<Icon name="inbox" />} label="Findings"
-              right={openInTab > 1 ? <button className="btn ghost xs" onClick={approveAll}>Approve all {openInTab}</button> : <span className="frame-r">{rows.length} items</span>}>
-              <div className="fl">
-                <div className="fl-h"><span>Party and action</span><span>What we found</span><span className="r">Amount (₹)</span><span /></div>
-                {rows.length === 0 && <p className="muted fl-empty">No actions for {seedMeta.company} under this use case.</p>}
-                {rows.map((f) => {
-                  const done = !!state.approved[f.id];
-                  return (
-                    <div key={f.id} className={`fl-r ${done ? "done" : ""}`}>
-                      <div className="fl-p"><span className={`dotsev ${f.severity}`} title={f.severity} /><div><b>{f.party}</b><em>{f.label || f.action}</em></div></div>
-                      <button className="fl-t" onClick={() => setOpen(f)}>{f.title.startsWith(f.party + ":") ? f.title.slice(f.party.length + 1).trim() : f.title}</button>
-                      <input className="amt num" aria-label={`Amount for ${f.party}`} value={Number(f.amount).toLocaleString("en-IN")}
-                        onChange={(e) => editAmount(f, e.target.value)} disabled={done} />
-                      <div className="acts">
-                        {done ? <button className="btn ghost xs" onClick={() => undo(f)}><Icon name="check" size={14} />Undo</button>
-                          : <button className="btn xs" onClick={() => setOpen(f)}>Review</button>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Frame>
           </div>
-        )}
-        <p className="foot">Sample company data. Emails go only to your own address{user.email ? ` (${user.email})` : ""}.</p>
-      </main>
+        </div></header>
 
-      {open && <FindingPanel f={open} state={state} onClose={() => setOpen(null)} onApprove={approve} demo={demo} waOk={!demo && !!waLink(user.mobile, open)} email={user.email} />}
+        <main className="fx-wrap">
+          {view !== "area" && <Hero state={state} now={now} base={base} proj={proj} flash={flash} showFlow={view === "hub"} onGo={onHeroGo} scope={view === "hub" ? { area, uc: hubUc } : {}} />}
+          {view === "hub" ? (
+            <Hub state={state} list={list} now={now} seg={seg} setSeg={setSeg} area={area} setArea={setArea} uc={hubUc} setUc={(u) => { setHubUc(u); if (u) setTab(u); }}
+              onOpen={(f) => setOpen(f)} onEdit={editAmount} onUndo={undo} onApproveAll={approveAll} />
+          ) : view === "area" ? (
+            <Area key={area} state={state} list={list} now={now} base={base} area={area} uc={areaUc} setUc={setAreaUc} onHub={(u) => goHub("todo", areaOf(u), u)} />
+          ) : view === "impact" ? (
+            <Impact state={state} now={now} base={base} proj={proj} list={list} co={co} downloads={downloads} emails={emails} onOpen={(f) => setOpen(f)} />
+          ) : (
+            <Board state={state} now={now} base={base} proj={proj} onOpen={(f) => setOpen(f)} onEdit={editAmount} onUndo={undo}
+              onPickArea={(id) => goArea(id)} onPickUc={pickUc} onSeeAll={() => goHub("todo")} />
+          )}
+          <p className="fx-legal">Live data from Tally through FlowIQ Automation. Emails go only to your own address{user.email ? ` (${user.email})` : ""}.</p>
+        </main>
+      </div>
+
+      {open && <CaseFile key={open.id} f={list.find((x) => x.id === open.id) || open} state={state} onClose={() => setOpen(null)} onApprove={approve} onUndo={undo} demo={demo} waOk={!demo && !!waLink(user.mobile, open)} email={user.email} />}
       {editing && <EditDrawer state={state} setState={setState} onClose={() => setEditing(false)} />}
-      {toast && <div className="toast" role="status">{toast}</div>}
+      <Palette open={kp} setOpen={setKp} sections={sections} findings={list} state={state} onSection={onSection} onFinding={(f) => setOpen(f)} />
+      <Tip />
+      {toast && <div className="fx-toast" role="status">{toast}</div>}
     </div>
   );
 }
 
 function EditDrawer({ state, setState, onClose }) {
+  useEffect(() => { const k = (e) => e.key === "Escape" && onClose(); window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k); }, [onClose]);
   const n = (v) => Math.max(0, Number(String(v).replace(/[^\d.]/g, "")) || 0);
   const setIn = (k) => (e) => setState({ ...state, inputs: { ...state.inputs, [k]: n(e.target.value) } });
   const setAge = (i) => (e) => setState({ ...state, ageing: state.ageing.map((b, j) => (j === i ? { ...b, amount: n(e.target.value) } : b)) });
   const fmt = (v) => Number(v).toLocaleString("en-IN");
   const F = ({ label, value, on, key }) => (
-    <div className="f" key={key || label}><span>{label}</span><input className="num" value={fmt(value)} onChange={on} /></div>
+    <label className="fx-f" key={key || label}><span>{label}</span><input className="num" value={fmt(value)} onChange={on} /></label>
   );
   return (
     <>
-      <div className="scrim" onClick={onClose} />
-      <aside className="drawer edit" aria-label="Edit numbers">
-        <div className="mh"><h2>Edit numbers</h2><button className="x" onClick={onClose} aria-label="Close">×</button></div>
-        <p className="ucnote">Every change updates the dashboard instantly.</p>
-        <h3>Position</h3>
-        {F({ label: "Cash & bank (₹)", value: state.inputs.cash, on: setIn("cash") })}
-        {F({ label: "Receivables (₹)", value: state.inputs.receivables, on: setIn("receivables") })}
-        {F({ label: "Net sales, last 90 days (₹)", value: state.inputs.netSales90, on: setIn("netSales90") })}
-        {F({ label: "Interest rate on early / late payments (%)", value: state.inputs.interestRate, on: setIn("interestRate") })}
-        <h3>Customer dues by days overdue</h3>
-        {state.ageing.map((b, i) => F({ label: b.bucket, value: b.amount, on: setAge(i), key: b.bucket }))}
-        <div style={{ marginTop: 20 }}><button className="btn" onClick={onClose}>Done</button></div>
+      <div className="fx-scrim" onClick={onClose} />
+      <aside className="fx-drawer fx-edit" aria-label="Edit numbers">
+        <div className="fx-cf-top">
+          <div className="fx-cf-band" style={{ gridTemplateColumns: "minmax(0,1fr)" }}><div><span className="area">Every change updates the dashboard instantly</span><h2>Edit numbers</h2></div></div>
+          <button className="fx-x" onClick={onClose} aria-label="Close"><Ic n="x" s={16} /></button>
+        </div>
+        <div className="fx-cf-body">
+          <h3>Position</h3>
+          {F({ label: "Cash & bank (₹)", value: state.inputs.cash, on: setIn("cash") })}
+          {F({ label: "Receivables (₹)", value: state.inputs.receivables, on: setIn("receivables") })}
+          {F({ label: "Net sales, last 90 days (₹)", value: state.inputs.netSales90, on: setIn("netSales90") })}
+          {F({ label: "Interest rate on early / late payments (%)", value: state.inputs.interestRate, on: setIn("interestRate") })}
+          <h3>Customer dues by days overdue</h3>
+          {state.ageing.map((b, i) => F({ label: b.bucket, value: b.amount, on: setAge(i), key: b.bucket }))}
+        </div>
+        <div className="fx-dact"><button className="fx-btn pri" onClick={onClose}>Done</button></div>
       </aside>
     </>
   );
