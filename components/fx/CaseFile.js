@@ -1,7 +1,7 @@
 "use client";
 // The case file for one finding: why it was raised, what approving does (and does to the numbers), the message, the checks.
 import { useEffect, useState } from "react";
-import { OWNER, SOURCE, UC, compute, impactOf, inr } from "@/lib/engine";
+import { OWNER, SOURCE, UC, compute, impactOf, inr, LB } from "@/lib/engine";
 import { Ic, Mono, areaLabel, areaOf, days } from "./ui";
 
 export default function CaseFile({ f, state, onClose, onApprove, onUndo, demo, waOk, email }) {
@@ -19,7 +19,7 @@ export default function CaseFile({ f, state, onClose, onApprove, onUndo, demo, w
   const eff = [];
   if (Math.abs(after.cash - before.cash) > 0.5) eff.push(["Cash & bank", inr(before.cash), inr(after.cash), "up"]);
   if (Math.abs(after.dso - before.dso) > 0.05) eff.push(["DSO", days(before.dso), days(after.dso), "up"]);
-  if (Math.abs(after.overdue - before.overdue) > 0.5) eff.push(["Overdue from customers", inr(before.overdue), inr(after.overdue), "up"]);
+  if (Math.abs(after.overdue - before.overdue) > 0.5) eff.push([LB("overdue", "Overdue from customers"), inr(before.overdue), inr(after.overdue), "up"]);
   if (i.saved || i.protect) eff.push(["Saved & risk stopped", inr(before.value), inr(after.value), "up"]);
   eff.push(["Still at stake", inr(before.atStake), inr(after.atStake), "up"]);
 

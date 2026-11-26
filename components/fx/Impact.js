@@ -1,7 +1,7 @@
 "use client";
 // Impact report: what the approved actions achieved, before vs after, the top actions and recoveries, and every action.
 import { useMemo, useState } from "react";
-import { AREAS, OWNER, UC, compute, impactOf, inr, seedMeta } from "@/lib/engine";
+import { AREAS, OWNER, UC, compute, impactOf, inr, seedMeta, LB } from "@/lib/engine";
 import { reportUrl } from "@/lib/companies";
 import { Ic, Mono, areaLabel, areaOf, days, hueOfArea, tip } from "./ui";
 
@@ -28,7 +28,7 @@ export default function Impact({ state, now, base, proj, list, co, downloads, em
 
   const rows = [
     ["Cash & bank", B.cash, K.cash, P.cash, 1, "m"], ["Receivables", B.receivables, K.receivables, P.receivables, -1, "m"],
-    ["Overdue from customers", B.overdue, K.overdue, P.overdue, -1, "m"], ["Overdue more than 60 days", B.over60, K.over60, P.over60, -1, "m"],
+    [LB("overdue", "Overdue from customers"), B.overdue, K.overdue, P.overdue, -1, "m"], ["Overdue more than 60 days", B.over60, K.over60, P.over60, -1, "m"],
     ["Days sales outstanding", B.dso, K.dso, P.dso, -1, "d"], ["Still at stake", B.atStake, K.atStake, P.atStake, -1, "m"],
     ["Saved & risk stopped", B.value, K.value, P.value, 1, "m"], ["Actions approved", B.done, K.done, P.done, 1, "n"],
   ];
@@ -69,7 +69,7 @@ export default function Impact({ state, now, base, proj, list, co, downloads, em
 
       <div className="fx-ik">
         <div className="ach"><span className="l">Achieved</span><b className="num">{inr(achieved)}</b><span className="s">cash in, cost saved and risk stopped</span></div>
-        <div><span className="l">Collected from customers</span><b className="num">{inr(R.tot.collected)}</b><span className="s">{recs.length ? `from ${Object.keys(rec).length} customer${Object.keys(rec).length === 1 ? "" : "s"}` : "no collection approved yet"}</span></div>
+        <div><span className="l">Collected from {LB("customers", "customers")}</span><b className="num">{inr(R.tot.collected)}</b><span className="s">{recs.length ? `from ${Object.keys(rec).length} customer${Object.keys(rec).length === 1 ? "" : "s"}` : "no collection approved yet"}</span></div>
         <div><span className="l">Overdue receivables</span><b className="num">{inr(K.overdue)}</b>{chg(B.overdue, K.overdue, -1, "m")}</div>
         <div><span className="l">Days sales outstanding</span><b className="num">{days(K.dso)}</b>{chg(B.dso, K.dso, -1, "d")}</div>
         <div><span className="l">Still at stake</span><b className="num">{inr(K.atStake)}</b><span className="s">{K.total - K.done} open issue{K.total - K.done === 1 ? "" : "s"}</span></div>
@@ -83,10 +83,10 @@ export default function Impact({ state, now, base, proj, list, co, downloads, em
           ))}</div> : <div className="fx-empty sm"><Ic n="bolt" s={20} /><b>No approvals in this period</b><span>Approve actions in the Action Hub and their impact shows here.</span></div>}
         </section>
         <section className="fx-tile s6">
-          <div className="th"><div><h3>Highest recoveries from customers</h3><p>Overdue collected through approved reminders</p></div></div>
+          <div className="th"><div><h3>{LB("recoveries", "Highest recoveries from customers")}</h3><p>Overdue collected through approved reminders</p></div></div>
           {recs.length ? <div className="fx-rank">{recs.map((r, k) => (
             <div key={r.party} className="row"><span className="i">{k + 1}</span><Mono name={r.party} uc={r.uc} /><span className="p"><b>{r.party}</b><small>{r.n} action{r.n === 1 ? "" : "s"}</small></span><em className="num up">{inr(r.v)}</em></div>
-          ))}</div> : <div className="fx-empty sm"><Ic n="wallet" s={20} /><b>No customer payments in this period</b><span>Approve a collection reminder to see the recovery here.</span></div>}
+          ))}</div> : <div className="fx-empty sm"><Ic n="wallet" s={20} /><b>No {LB("customers", "customer").replace(/s$/, "")} payments in this period</b><span>Approve a collection reminder to see the recovery here.</span></div>}
         </section>
 
         <section className="fx-tile s12">

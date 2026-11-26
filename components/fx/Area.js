@@ -3,14 +3,15 @@
 // Header with Before/After pills, Results so far / Forecast, four KPIs, check tabs with include switches,
 // Before vs after side by side, and the Actions workflow for the check.
 import { useState } from "react";
-import { AREAS, UC, compute, impactOf, inr, playbooks, seedMeta } from "@/lib/engine";
-import { Ic, areaLabel, days, hueOfArea, tip } from "./ui";
+import { AREAS, LB, OWN_UCS, UC, compute, impactOf, inr, playbooks, seedMeta } from "@/lib/engine";
+import { AREA_ICON, Ic, areaLabel, areaOf, days, hueOfArea, tip } from "./ui";
 
 const BEF = "#D1242F", AFT = "#178548";
 // The names the Automation dashboard uses for the first eight checks; the rest use the catalogue name.
 const NAME8 = { UC1: "Late-paying customers", UC2: "Over credit limit", UC3: "Selling to late payers", UC4: "Duplicate entries",
   UC5: "Supplier payment timing", UC6: "GST credit at risk", UC7: "Bills not matching orders", UC8: "Sales invoice errors" };
-export const ucTitle = (k) => NAME8[k] || UC[k]?.name || k;
+export const ucTitle = (k) => (OWN_UCS ? UC[k]?.name : NAME8[k] || UC[k]?.name) || k;
+const ucIcon = (k) => (OWN_UCS ? AREA_ICON[areaOf(k)] : UCI[k]) || "grid";
 const UCI = { UC1: "receipt", UC2: "alert", UC3: "x", UC4: "layers", UC5: "wallet", UC6: "scale", UC7: "checkc", UC8: "file" };
 const PARTY_TYPES = new Set(["reminder", "refund_request", "debit_note_request", "gst_vendor_followup"]);
 const CUSTOMER_UC = new Set(["UC1", "UC2", "UC3", "UC8", "UC9"]);
@@ -54,7 +55,7 @@ function Flow({ uc, fs }) {
   return (
     <div className="fx-flow2">
       {Object.entries(groups).map(([t, xs]) => {
-        const f = xs[0], party = PARTY_TYPES.has(t) && !/internal/i.test(f.label || ""), who = CUSTOMER_UC.has(uc) ? "customer" : "supplier";
+        const f = xs[0], party = f.party_msg ?? (PARTY_TYPES.has(t) && !/internal/i.test(f.label || "")), who = f.who || (CUSTOMER_UC.has(uc) ? "customer" : "supplier");
         const fu = Number(f.followup) || 0, info = /\(internal\)|note \(internal\)/i.test(f.label || "") && !fu;
         return (
           <div key={t} className="grp">
@@ -81,8 +82,8 @@ function Flow({ uc, fs }) {
                 {party ? (
                   <div className="out">
                     <div><b>No reply</b>The next reminder is drafted on schedule; after the last one, the escalation.</div>
-                    <div><b>{who === "customer" ? "Pays in full" : "Sends the credit note"}</b>Seen in Tally at the next sync - closed, no more reminders.</div>
-                    <div><b>{who === "customer" ? "Pays part" : "Corrects part"}</b>Reminders continue for the balance only, with the new amount.</div>
+                    <div><b>{who !== "supplier" ? "Pays in full" : "Sends the credit note"}</b>Seen in Tally at the next sync - closed, no more reminders.</div>
+                    <div><b>{who !== "supplier" ? "Pays part" : "Corrects part"}</b>Reminders continue for the balance only, with the new amount.</div>
                     <div><b>Promises a date</b>Reminders pause until that date + 1 day; if nothing arrives, a "promise not kept" message is drafted.</div>
                     <div><b>Says already done</b>FlowIQ waits 3 days for the entry in Tally, then reminds.</div>
                     <div><b>Disputes or asks a question</b>Reminders stop; the reply comes to you to decide the next step.</div>
@@ -116,7 +117,7 @@ export default function Area({ state, list, now, base, area, uc, setUc, onHub })
   const isDone = (f) => !!state.approved[f.id];
   const amt = (xs) => xs.reduce((t, f) => t + (Number(f.amount) || 0), 0);
   const today = new Date();
-  const dec = cur === "UC5";
+  const dec = cur === "UC5" && !OWN_UCS;
   const K = now.kpi;
 
   // ----- results so far: position at the start of the period vs now
@@ -148,7 +149,7 @@ export default function Area({ state, list, now, base, area, uc, setUc, onHub })
     kpis.push(<Kpi key="r" tag="Resolved" label="in this period" now={String(inP.length)} />);
     const rows = [{ k: "Money at stake", b: amt(openB), a: amt(openA) }];
     if (!risk) rows.push({ k: "Expected impact", b: openB.reduce((t, f) => t + valOf(f, state.inputs), 0), a: openA.reduce((t, f) => t + valOf(f, state.inputs), 0) });
-    if (cur === "UC1") rows.push({ k: "Overdue receivables", b: KB.overdue, a: K.overdue }, { k: "Overdue more than 60 days", b: KB.over60, a: K.over60 });
+    if (cur === "UC1") rows.push({ k: LB("overdue", "Overdue receivables"), b: KB.overdue, a: K.overdue }, { k: "Overdue more than 60 days", b: KB.over60, a: K.over60 });
     const mx = Math.max(1, ...rows.flatMap((r) => [r.b, r.a]));
     const T2 = (r) => [[`At ${fromLbl}`, inr(r.b, true), BEF], [`On ${toLbl}`, inr(r.a, true), AFT], ["Change", sg(r.a - r.b)]];
     rows.forEach((r) => { rowsB.push({ k: r.k, v: r.b, tt: T2(r) }); rowsA.push({ k: r.k, v: r.a, tt: T2(r) }); });
@@ -189,7 +190,7 @@ export default function Area({ state, list, now, base, area, uc, setUc, onHub })
       const tb = rows.reduce((s, r) => s + r.b, 0), ta = rows.reduce((s, r) => s + r.a, 0);
       const benefit = on(cur) ? open.reduce((t, f) => t + valOf(f, state.inputs), 0) : 0;
       const lbl = { UC2: ["Above", "credit limits", "Amount above limits"], UC3: ["At risk", "new invoices", "Owed on new invoices to late payers"], UC4: ["Entered", "twice", "Amount entered twice"],
-        UC6: ["At risk", "GST credit", "GST credit at risk"], UC7: ["Excess", "billed", "Billed above PO / receipt"], UC8: ["Blocked", "invoices", "Invoice value at risk of rejection"] }[cur] || ["At stake", "amount", "Amount at stake"];
+        UC6: ["At risk", "GST credit", "GST credit at risk"], UC7: ["Excess", "billed", "Billed above PO / receipt"], UC8: ["Blocked", "invoices", "Invoice value at risk of rejection"] }[OWN_UCS ? "" : cur] || ["At stake", "amount", "Amount at stake"];
       kpis.push(<Kpi key="s" tag={lbl[0]} label={lbl[1]} now={inr(tb, true)} after={inr(ta, true)} chg={tb - ta > 0 ? `−${inr(tb - ta, true)}` : "no change"} />);
       kpis.push(<Kpi key="b" tag="Benefit" label="projected" now={inr(benefit, true)} t={tip("Projected benefit", [["Amount", inr(benefit, true), AFT]])} />);
       kpis.push(<Kpi key="i" tag="Items" label="found" now={String(fs.length)} />);
@@ -212,7 +213,7 @@ export default function Area({ state, list, now, base, area, uc, setUc, onHub })
     <div className="fx-cx">
       <section className="fx-card">
         <div className="fx-cxh">
-          <span className="fx-cxi" style={{ background: hueOfArea(area) }}><Ic n={UCI[cur] || "grid"} s={18} /></span>
+          <span className="fx-cxi" style={{ background: hueOfArea(area) }}><Ic n={ucIcon(cur)} s={18} /></span>
           <div><h2>{ucTitle(cur)}</h2><div className="sub">{areaLabel(area)} · Tally entries up to {fmtDay(new Date(today.getTime() - 864e5))}</div></div>
           <div className="r">{pills}</div>
         </div>
@@ -233,8 +234,8 @@ export default function Area({ state, list, now, base, area, uc, setUc, onHub })
             const n = list.filter((f) => f.uc === k && !isDone(f)).length;
             return (
               <button key={k} className={`fx-ptab ${on(k) ? "" : "off"}`} aria-pressed={cur === k} onClick={() => setUc(k)}>
-                <Ic n={UCI[k] || "grid"} s={15} />{ucTitle(k)}<em className="num">{n}</em>
-                {k !== "UC5" && <span className="tg" role="switch" aria-checked={on(k)} aria-label={`Include ${ucTitle(k)} in totals`}
+                <Ic n={ucIcon(k)} s={15} />{ucTitle(k)}<em className="num">{n}</em>
+                {(k !== "UC5" || OWN_UCS) && <span className="tg" role="switch" aria-checked={on(k)} aria-label={`Include ${ucTitle(k)} in totals`}
                   onClick={(e) => { e.stopPropagation(); setOff({ ...off, [k]: on(k) }); }} />}
               </button>
             );

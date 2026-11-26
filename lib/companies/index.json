@@ -1,218 +1,285 @@
 [
-  {
-    "key": "vardhan",
-    "id": "Vardhan_Home_Industrial_Products_Pvt_Ltd",
-    "name": "Vardhan Home & Industrial",
-    "findings": 66,
-    "atStake": 85863547,
-    "useCases": 8,
-    "file": null,
-    "downloads": [
-      {
-        "id": "mis_daily",
-        "title": "MIS report - Daily",
-        "group": "MIS report (PDF)",
-        "period": "daily",
-        "format": "pdf",
-        "filename": "Vardhan_Home_Industrial_MIS_report_Daily_2026-11-18.pdf",
-        "covers": "up to 17-Nov-2026",
-        "built_at": "2026-11-18T05:48:19"
-      },
-      {
-        "id": "mis_weekly",
-        "title": "MIS report - Weekly",
-        "group": "MIS report (PDF)",
-        "period": "weekly",
-        "format": "pdf",
-        "filename": "Vardhan_Home_Industrial_MIS_report_Weekly_2026-11-18.pdf",
-        "covers": "up to 17-Nov-2026",
-        "built_at": "2026-11-18T05:48:26"
-      },
-      {
-        "id": "mis_monthly",
-        "title": "MIS report - Monthly",
-        "group": "MIS report (PDF)",
-        "period": "monthly",
-        "format": "pdf",
-        "filename": "Vardhan_Home_Industrial_MIS_report_Monthly_2026-11-18.pdf",
-        "covers": "up to 17-Nov-2026",
-        "built_at": "2026-11-18T05:48:32"
-      },
-      {
-        "id": "actionable_weekly",
-        "title": "Actionable report - Weekly",
-        "group": "Actionable report (Excel)",
-        "period": "weekly",
-        "format": "xlsx",
-        "filename": "Vardhan_Home_Industrial_Actionable_report_Weekly_2026-11-18.xlsx",
-        "covers": "11-Nov-2026 to 17-Nov-2026",
-        "built_at": "2026-11-18T05:48:38"
-      },
-      {
-        "id": "actionable_monthly",
-        "title": "Actionable report - Monthly",
-        "group": "Actionable report (Excel)",
-        "period": "monthly",
-        "format": "xlsx",
-        "filename": "Vardhan_Home_Industrial_Actionable_report_Monthly_2026-11-18.xlsx",
-        "covers": "19-Oct-2026 to 17-Nov-2026",
-        "built_at": "2026-11-18T05:48:45"
-      },
-      {
-        "id": "impact_report",
-        "title": "Impact report - Full report (Excel)",
-        "group": "Impact report (Excel)",
-        "period": "impact",
-        "format": "xlsx",
-        "filename": "Vardhan_Home_Industrial_Impact_report_2026-11-23.xlsx",
-        "covers": "what the actions achieved, up to 23-Nov-2026",
-        "built_at": "2026-11-23T23:50:03"
-      }
-    ],
-    "label": "Vardhan Home & Industrial"
-  },
-  {
-    "key": "kaveri",
-    "id": "Kaveri_Pumps_Valves_Pvt_Ltd",
-    "name": "Kaveri Pumps & Valves",
-    "findings": 117,
-    "atStake": 72361176,
-    "useCases": 40,
-    "file": "kaveri.json",
-    "downloads": [
-      {
-        "id": "mis_daily",
-        "title": "MIS report - Daily",
-        "group": "MIS report (PDF)",
-        "period": "daily",
-        "format": "pdf",
-        "filename": "Kaveri_Pumps_Valves_MIS_report_Daily_2026-11-19.pdf",
-        "covers": "up to 19-Nov-2026",
-        "built_at": "2026-11-19T12:32:03"
-      },
-      {
-        "id": "mis_weekly",
-        "title": "MIS report - Weekly",
-        "group": "MIS report (PDF)",
-        "period": "weekly",
-        "format": "pdf",
-        "filename": "Kaveri_Pumps_Valves_MIS_report_Weekly_2026-11-19.pdf",
-        "covers": "up to 19-Nov-2026",
-        "built_at": "2026-11-19T12:32:09"
-      },
-      {
-        "id": "mis_monthly",
-        "title": "MIS report - Monthly",
-        "group": "MIS report (PDF)",
-        "period": "monthly",
-        "format": "pdf",
-        "filename": "Kaveri_Pumps_Valves_MIS_report_Monthly_2026-11-19.pdf",
-        "covers": "up to 19-Nov-2026",
-        "built_at": "2026-11-19T12:31:35"
-      },
-      {
-        "id": "actionable_weekly",
-        "title": "Actionable report - Weekly",
-        "group": "Actionable report (Excel)",
-        "period": "weekly",
-        "format": "xlsx",
-        "filename": "Kaveri_Pumps_Valves_Actionable_report_Weekly_2026-11-19.xlsx",
-        "covers": "13-Nov-2026 to 19-Nov-2026",
-        "built_at": "2026-11-19T12:32:19"
-      },
-      {
-        "id": "actionable_monthly",
-        "title": "Actionable report - Monthly",
-        "group": "Actionable report (Excel)",
-        "period": "monthly",
-        "format": "xlsx",
-        "filename": "Kaveri_Pumps_Valves_Actionable_report_Monthly_2026-11-19.xlsx",
-        "covers": "21-Oct-2026 to 19-Nov-2026",
-        "built_at": "2026-11-19T12:32:26"
-      },
-      {
-        "id": "impact_report",
-        "title": "Impact report - Full report (Excel)",
-        "group": "Impact report (Excel)",
-        "period": "impact",
-        "format": "xlsx",
-        "filename": "Kaveri_Pumps_Valves_Impact_report_2026-11-23.xlsx",
-        "covers": "what the actions achieved, up to 23-Nov-2026",
-        "built_at": "2026-11-23T23:50:03"
-      }
-    ],
-    "label": "Kaveri Pumps & Valves (Manufacturing)"
-  },
-  {
-    "key": "aanya",
-    "id": "Aanya_Kitchen_Home_Essentials_Pvt_Ltd",
-    "name": "Aanya Kitchen & Home",
-    "findings": 87,
-    "atStake": 502174,
-    "useCases": 9,
-    "file": "aanya.json",
-    "downloads": [
-      {
-        "id": "mis_daily",
-        "title": "MIS report - Daily",
-        "group": "MIS report (PDF)",
-        "period": "daily",
-        "format": "pdf",
-        "filename": "Aanya_Kitchen_Home_MIS_report_Daily_2026-11-18.pdf",
-        "covers": "up to 18-Nov-2026",
-        "built_at": "2026-11-18T13:14:09"
-      },
-      {
-        "id": "mis_weekly",
-        "title": "MIS report - Weekly",
-        "group": "MIS report (PDF)",
-        "period": "weekly",
-        "format": "pdf",
-        "filename": "Aanya_Kitchen_Home_MIS_report_Weekly_2026-11-18.pdf",
-        "covers": "up to 18-Nov-2026",
-        "built_at": "2026-11-18T13:14:15"
-      },
-      {
-        "id": "mis_monthly",
-        "title": "MIS report - Monthly",
-        "group": "MIS report (PDF)",
-        "period": "monthly",
-        "format": "pdf",
-        "filename": "Aanya_Kitchen_Home_MIS_report_Monthly_2026-11-18.pdf",
-        "covers": "up to 18-Nov-2026",
-        "built_at": "2026-11-18T13:14:20"
-      },
-      {
-        "id": "actionable_weekly",
-        "title": "Actionable report - Weekly",
-        "group": "Actionable report (Excel)",
-        "period": "weekly",
-        "format": "xlsx",
-        "filename": "Aanya_Kitchen_Home_Actionable_report_Weekly_2026-11-18.xlsx",
-        "covers": "12-Nov-2026 to 18-Nov-2026",
-        "built_at": "2026-11-18T13:14:27"
-      },
-      {
-        "id": "actionable_monthly",
-        "title": "Actionable report - Monthly",
-        "group": "Actionable report (Excel)",
-        "period": "monthly",
-        "format": "xlsx",
-        "filename": "Aanya_Kitchen_Home_Actionable_report_Monthly_2026-11-18.xlsx",
-        "covers": "20-Oct-2026 to 18-Nov-2026",
-        "built_at": "2026-11-18T13:14:34"
-      },
-      {
-        "id": "impact_report",
-        "title": "Impact report - Full report (Excel)",
-        "group": "Impact report (Excel)",
-        "period": "impact",
-        "format": "xlsx",
-        "filename": "Aanya_Kitchen_Home_Impact_report_2026-11-23.xlsx",
-        "covers": "what the actions achieved, up to 23-Nov-2026",
-        "built_at": "2026-11-23T23:50:03"
-      }
-    ],
-    "label": "Aanya Kitchen & Home (Ecommerce)"
-  }
+ {
+  "key": "vardhan",
+  "id": "Vardhan_Home_Industrial_Products_Pvt_Ltd",
+  "name": "Vardhan Home & Industrial",
+  "findings": 66,
+  "atStake": 85863547,
+  "useCases": 8,
+  "file": null,
+  "downloads": [
+   {
+    "id": "mis_daily",
+    "title": "MIS report - Daily",
+    "group": "MIS report (PDF)",
+    "period": "daily",
+    "format": "pdf",
+    "filename": "Vardhan_Home_Industrial_MIS_report_Daily_2026-11-18.pdf",
+    "covers": "up to 17-Nov-2026",
+    "built_at": "2026-11-18T05:48:19"
+   },
+   {
+    "id": "mis_weekly",
+    "title": "MIS report - Weekly",
+    "group": "MIS report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Vardhan_Home_Industrial_MIS_report_Weekly_2026-11-18.pdf",
+    "covers": "up to 17-Nov-2026",
+    "built_at": "2026-11-18T05:48:26"
+   },
+   {
+    "id": "mis_monthly",
+    "title": "MIS report - Monthly",
+    "group": "MIS report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Vardhan_Home_Industrial_MIS_report_Monthly_2026-11-18.pdf",
+    "covers": "up to 17-Nov-2026",
+    "built_at": "2026-11-18T05:48:32"
+   },
+   {
+    "id": "actionable_weekly",
+    "title": "Actionable report - Weekly",
+    "group": "Actionable report (Excel)",
+    "period": "weekly",
+    "format": "xlsx",
+    "filename": "Vardhan_Home_Industrial_Actionable_report_Weekly_2026-11-18.xlsx",
+    "covers": "11-Nov-2026 to 17-Nov-2026",
+    "built_at": "2026-11-18T05:48:38"
+   },
+   {
+    "id": "actionable_monthly",
+    "title": "Actionable report - Monthly",
+    "group": "Actionable report (Excel)",
+    "period": "monthly",
+    "format": "xlsx",
+    "filename": "Vardhan_Home_Industrial_Actionable_report_Monthly_2026-11-18.xlsx",
+    "covers": "19-Oct-2026 to 17-Nov-2026",
+    "built_at": "2026-11-18T05:48:45"
+   },
+   {
+    "id": "impact_report",
+    "title": "Impact report - Full report (Excel)",
+    "group": "Impact report (Excel)",
+    "period": "impact",
+    "format": "xlsx",
+    "filename": "Vardhan_Home_Industrial_Impact_report_2026-11-23.xlsx",
+    "covers": "what the actions achieved, up to 23-Nov-2026",
+    "built_at": "2026-11-23T23:50:03"
+   }
+  ],
+  "label": "Vardhan Home & Industrial"
+ },
+ {
+  "key": "kaveri",
+  "id": "Kaveri_Pumps_Valves_Pvt_Ltd",
+  "name": "Kaveri Pumps & Valves",
+  "findings": 117,
+  "atStake": 72361176,
+  "useCases": 40,
+  "file": "kaveri.json",
+  "downloads": [
+   {
+    "id": "mis_daily",
+    "title": "MIS report - Daily",
+    "group": "MIS report (PDF)",
+    "period": "daily",
+    "format": "pdf",
+    "filename": "Kaveri_Pumps_Valves_MIS_report_Daily_2026-11-19.pdf",
+    "covers": "up to 19-Nov-2026",
+    "built_at": "2026-11-19T12:32:03"
+   },
+   {
+    "id": "mis_weekly",
+    "title": "MIS report - Weekly",
+    "group": "MIS report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Kaveri_Pumps_Valves_MIS_report_Weekly_2026-11-19.pdf",
+    "covers": "up to 19-Nov-2026",
+    "built_at": "2026-11-19T12:32:09"
+   },
+   {
+    "id": "mis_monthly",
+    "title": "MIS report - Monthly",
+    "group": "MIS report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Kaveri_Pumps_Valves_MIS_report_Monthly_2026-11-19.pdf",
+    "covers": "up to 19-Nov-2026",
+    "built_at": "2026-11-19T12:31:35"
+   },
+   {
+    "id": "actionable_weekly",
+    "title": "Actionable report - Weekly",
+    "group": "Actionable report (Excel)",
+    "period": "weekly",
+    "format": "xlsx",
+    "filename": "Kaveri_Pumps_Valves_Actionable_report_Weekly_2026-11-19.xlsx",
+    "covers": "13-Nov-2026 to 19-Nov-2026",
+    "built_at": "2026-11-19T12:32:19"
+   },
+   {
+    "id": "actionable_monthly",
+    "title": "Actionable report - Monthly",
+    "group": "Actionable report (Excel)",
+    "period": "monthly",
+    "format": "xlsx",
+    "filename": "Kaveri_Pumps_Valves_Actionable_report_Monthly_2026-11-19.xlsx",
+    "covers": "21-Oct-2026 to 19-Nov-2026",
+    "built_at": "2026-11-19T12:32:26"
+   },
+   {
+    "id": "impact_report",
+    "title": "Impact report - Full report (Excel)",
+    "group": "Impact report (Excel)",
+    "period": "impact",
+    "format": "xlsx",
+    "filename": "Kaveri_Pumps_Valves_Impact_report_2026-11-23.xlsx",
+    "covers": "what the actions achieved, up to 23-Nov-2026",
+    "built_at": "2026-11-23T23:50:03"
+   }
+  ],
+  "label": "Kaveri Pumps & Valves (Manufacturing)"
+ },
+ {
+  "key": "aanya",
+  "id": "Aanya_Kitchen_Home_Essentials_Pvt_Ltd",
+  "name": "Aanya Kitchen & Home",
+  "findings": 87,
+  "atStake": 502174,
+  "useCases": 9,
+  "file": "aanya.json",
+  "downloads": [
+   {
+    "id": "mis_daily",
+    "title": "MIS report - Daily",
+    "group": "MIS report (PDF)",
+    "period": "daily",
+    "format": "pdf",
+    "filename": "Aanya_Kitchen_Home_MIS_report_Daily_2026-11-18.pdf",
+    "covers": "up to 18-Nov-2026",
+    "built_at": "2026-11-18T13:14:09"
+   },
+   {
+    "id": "mis_weekly",
+    "title": "MIS report - Weekly",
+    "group": "MIS report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Aanya_Kitchen_Home_MIS_report_Weekly_2026-11-18.pdf",
+    "covers": "up to 18-Nov-2026",
+    "built_at": "2026-11-18T13:14:15"
+   },
+   {
+    "id": "mis_monthly",
+    "title": "MIS report - Monthly",
+    "group": "MIS report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Aanya_Kitchen_Home_MIS_report_Monthly_2026-11-18.pdf",
+    "covers": "up to 18-Nov-2026",
+    "built_at": "2026-11-18T13:14:20"
+   },
+   {
+    "id": "actionable_weekly",
+    "title": "Actionable report - Weekly",
+    "group": "Actionable report (Excel)",
+    "period": "weekly",
+    "format": "xlsx",
+    "filename": "Aanya_Kitchen_Home_Actionable_report_Weekly_2026-11-18.xlsx",
+    "covers": "12-Nov-2026 to 18-Nov-2026",
+    "built_at": "2026-11-18T13:14:27"
+   },
+   {
+    "id": "actionable_monthly",
+    "title": "Actionable report - Monthly",
+    "group": "Actionable report (Excel)",
+    "period": "monthly",
+    "format": "xlsx",
+    "filename": "Aanya_Kitchen_Home_Actionable_report_Monthly_2026-11-18.xlsx",
+    "covers": "20-Oct-2026 to 18-Nov-2026",
+    "built_at": "2026-11-18T13:14:34"
+   },
+   {
+    "id": "impact_report",
+    "title": "Impact report - Full report (Excel)",
+    "group": "Impact report (Excel)",
+    "period": "impact",
+    "format": "xlsx",
+    "filename": "Aanya_Kitchen_Home_Impact_report_2026-11-23.xlsx",
+    "covers": "what the actions achieved, up to 23-Nov-2026",
+    "built_at": "2026-11-23T23:50:03"
+   }
+  ],
+  "label": "Aanya Kitchen & Home (Ecommerce)"
+ },
+ {
+  "key": "aravali",
+  "id": "Aravali_Heights_AOA",
+  "name": "Aravali Heights AOA",
+  "findings": 95,
+  "atStake": 12334544,
+  "useCases": 25,
+  "file": "aravali.json",
+  "downloads": [
+   {
+    "id": "mc_mis_monthly",
+    "title": "Aravali Heights AOA - MC monthly report",
+    "short": "MC monthly report",
+    "group": "MIS report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Aravali_Heights_AOA_MC_monthly_report_2026-11-26.pdf",
+    "covers": "1-Apr-2026 to 31-Oct-2026",
+    "built_at": "2026-11-26T15:34:00"
+   },
+   {
+    "id": "action_report",
+    "title": "Aravali Heights AOA - Action report",
+    "short": "Action report",
+    "group": "Action report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Aravali_Heights_AOA_Action_report_2026-11-26.pdf",
+    "covers": "1-Apr-2026 to 31-Oct-2026",
+    "built_at": "2026-11-26T15:34:00"
+   },
+   {
+    "id": "impact_report",
+    "title": "Aravali Heights AOA - Impact report",
+    "short": "Impact report",
+    "group": "Impact report (Excel)",
+    "period": "impact",
+    "format": "xlsx",
+    "filename": "Aravali_Heights_AOA_Impact_report_2026-11-26.xlsx",
+    "covers": "what the actions achieved, up to 26-Nov-2026",
+    "built_at": "2026-11-26T15:34:00"
+   },
+   {
+    "id": "defaulter_list",
+    "title": "Aravali Heights AOA - Defaulter list",
+    "short": "Defaulter list",
+    "group": "Defaulter list (Excel)",
+    "period": "monthly",
+    "format": "xlsx",
+    "filename": "Aravali_Heights_AOA_Defaulter_list_2026-11-26.xlsx",
+    "covers": "1-Apr-2026 to 31-Oct-2026",
+    "built_at": "2026-11-26T15:34:00"
+   },
+   {
+    "id": "fund_statement",
+    "title": "Aravali Heights AOA - Fund statement",
+    "short": "Fund statement",
+    "group": "Fund statement (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Aravali_Heights_AOA_Fund_statement_2026-11-26.pdf",
+    "covers": "1-Apr-2026 to 31-Oct-2026",
+    "built_at": "2026-11-26T15:34:00"
+   }
+  ],
+  "label": "Aravali Heights AOA (Housing Society)"
+ }
 ]

@@ -1,6 +1,6 @@
 "use client";
 // The command band: where the money stands, what approving everything would do, and the pipeline.
-import { UC, impactOf, findingsOf, inr, seedFull, seedMeta } from "@/lib/engine";
+import { UC, impactOf, findingsOf, inr, seedFull, seedMeta, LB } from "@/lib/engine";
 import { Big, areaLabel, areaOf, days, tip } from "./ui";
 
 // How far "now" has moved from the start towards the position if every action were approved.
@@ -27,7 +27,7 @@ export default function Hero({ state, now, base, proj, flash = {}, showFlow, onG
   const found = amt(fs), openAmt = amt(open), actioned = Math.max(0, found - openAmt), ob = Math.max(found, 1), pc = (x) => Math.round((x / ob) * 100);
   let released = 0; for (const f of done) { const i = impactOf(f, state.inputs); released += i.cash + i.saved + i.protect; }
   const openN = open.length, doneN = done.length, total = fs.length;
-  const recArea = !scoped || (scope.uc ? areaOf(scope.uc) === "rec" : scope.area === "rec");
+  const recArea = !scoped || (scope.uc ? areaOf(scope.uc) === areaOf("UC1") : scope.area === areaOf("UC1"));
   const sevOrder = ["critical", "high", "medium", "low"];
   const topSev = sevOrder.find((s) => open.some((f) => f.severity === s));
   const biggest = open.slice().sort((x, y) => y.amount - x.amount)[0];
@@ -68,7 +68,7 @@ export default function Hero({ state, now, base, proj, flash = {}, showFlow, onG
                 <Track start={B.dso} now={K.dso} proj={P.dso} /><span className="p">→ {days(P.dso)} if all approved</span>
               </div>
               <div className={`fx-r ${flash.overdue ? "flash" : ""}`}>
-                <span className="l">Overdue from customers</span><span className="v num">{inr(K.overdue)}</span>{delta(K.overdue - B.overdue, -1)}
+                <span className="l">{LB("overdue", "Overdue from customers")}</span><span className="v num">{inr(K.overdue)}</span>{delta(K.overdue - B.overdue, -1)}
                 <Track start={B.overdue} now={K.overdue} proj={P.overdue} /><span className="p">→ {inr(P.overdue)} if all approved</span>
               </div>
             </div>

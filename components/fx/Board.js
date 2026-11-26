@@ -1,7 +1,7 @@
 "use client";
 // Overview: the money position, cash pulse, dues by age, exposure by area, approvals, priorities, scorecard.
 import { useEffect, useRef, useState } from "react";
-import { AREAS, UC, inr, scorecard, seedFull, sevLabel, topOpen } from "@/lib/engine";
+import { AREAS, UC, inr, scorecard, seedFull, sevLabel, topOpen, LB } from "@/lib/engine";
 import { Row } from "./Hub";
 import { AREA_ICON, Ic, days, hueOfArea, tip } from "./ui";
 
@@ -40,7 +40,7 @@ function Pulse({ mode }) {
           {m.map((r, i) => {
             const gap = (Number(r[ka]) || 0) - (Number(r[kb]) || 0);
             return <rect key={"h" + i} className="hit" x={L + bw * i} y={T} width={bw} height={H - T - B}
-              data-tip={tip(`${lab(r.m)} ${String(r.m).slice(0, 4)}`, [[mode === "sales" ? "Sales billed" : "Purchases", inr(r[ka], true), "#0F6B5B"], [mode === "sales" ? "Collected" : "Paid", inr(r[kb], true), cB],
+              data-tip={tip(`${lab(r.m)} ${String(r.m).slice(0, 4)}`, [[mode === "sales" ? LB("sales", "Sales billed") : LB("purchases", "Purchases"), inr(r[ka], true), "#0F6B5B"], [mode === "sales" ? "Collected" : "Paid", inr(r[kb], true), cB],
                 [gap >= 0 ? (mode === "sales" ? "Billed, not collected" : "Bought, not paid") : (mode === "sales" ? "Collected beyond billing" : "Paid beyond purchases"), inr(Math.abs(gap), true)]])} />;
           })}
         </svg>
@@ -72,7 +72,7 @@ export default function Board({ state, now, base, proj, onOpen, onEdit, onUndo, 
     <div className="fx-board">
       <div className="fx-stmt">
         <div><span>Receivables</span><b className="num">{inr(K.receivables)}</b>{dlt(K.receivables - B.receivables, -1)}</div>
-        <div className="risk"><span>Overdue from customers</span><b className="num">{inr(K.overdue)}</b>{dlt(K.overdue - B.overdue, -1)}</div>
+        <div className="risk"><span>{LB("overdue", "Overdue from customers")}</span><b className="num">{inr(K.overdue)}</b>{dlt(K.overdue - B.overdue, -1)}</div>
         <div><span>Payables</span><b className="num">{inr(pos.payables)}</b><small>DPO {days(pos.dpo)}</small></div>
         <div><span>Cash & bank</span><b className="num">{inr(K.cash)}</b>{dlt(K.cash - B.cash, 1)}</div>
       </div>
@@ -80,13 +80,13 @@ export default function Board({ state, now, base, proj, onOpen, onEdit, onUndo, 
       <div className="fx-bento">
         <section className="fx-tile s7">
           <div className="th"><div><h3>Cash pulse</h3><p>{mode === "sales" ? "Billed vs collected" : "Bought vs paid"} each month, from Tally</p></div>
-            <div className="fx-seg sm"><button aria-pressed={mode === "sales"} onClick={() => setMode("sales")}>Sales</button><button aria-pressed={mode === "buy"} onClick={() => setMode("buy")}>Purchases</button></div></div>
+            <div className="fx-seg sm"><button aria-pressed={mode === "sales"} onClick={() => setMode("sales")}>{LB("sales", "Sales")}</button><button aria-pressed={mode === "buy"} onClick={() => setMode("buy")}>{LB("purchases", "Purchases")}</button></div></div>
           <Pulse mode={mode} />
-          <div className="fx-lg"><span><i style={{ background: "#0F6B5B" }} />{mode === "sales" ? "Sales billed" : "Purchases"}</span><span><i className="ln" style={{ background: mode === "sales" ? "#C9A227" : "#3B5FC0" }} />{mode === "sales" ? "Collected" : "Paid"}</span></div>
+          <div className="fx-lg"><span><i style={{ background: "#0F6B5B" }} />{mode === "sales" ? LB("sales", "Sales billed") : LB("purchases", "Purchases")}</span><span><i className="ln" style={{ background: mode === "sales" ? "#C9A227" : "#3B5FC0" }} />{mode === "sales" ? "Collected" : "Paid"}</span></div>
         </section>
 
         <section className="fx-tile s5">
-          <div className="th"><div><h3>Customer dues by age</h3><p>Open customer bills. Collections clear the oldest first.</p></div><b className="fx-tot num">{inr(agT)}</b></div>
+          <div className="th"><div><h3>{LB("dues_by_age", "Customer dues by age").replace(/ days overdue$/, " age")}</h3><p>Open {LB("customers", "customer").replace(/s$/, "")} bills. Collections clear the oldest first.</p></div><b className="fx-tot num">{inr(agT)}</b></div>
           <div className="fx-agebar">{ag.map((b) => b.amount > 0 && (
             <i key={b.bucket} style={{ width: `${(b.amount / agT) * 100}%`, background: AGE_C[b.bucket] || "#999" }}
               data-tip={tip(b.bucket === "Not due" ? "Not yet due" : `${b.bucket} days overdue`, [["Now", inr(b.amount, true), AGE_C[b.bucket]], ["At the start", inr(base.ageing.find((x) => x.bucket === b.bucket)?.amount, true)], ["Share", Math.round((b.amount / agT) * 100) + "%"]])}>

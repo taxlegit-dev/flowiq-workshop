@@ -45,7 +45,8 @@ export function Ic({ n, s = 16, className = "" }) {
 // Area colours: one per business area, used by monograms, the exposure map and charts.
 const AREA_HUE = { rec: "#0F6B5B", pay: "#3B5FC0", gst: "#A0661A", proc: "#6A55A8", tax: "#B0476A", inv: "#4E7D2A", close: "#4B5563", mkt: "#C0563A" };
 const SPARE = ["#0F6B5B", "#3B5FC0", "#A0661A", "#6A55A8", "#B0476A", "#4E7D2A", "#4B5563", "#C0563A"];
-export const AREA_ICON = { rec: "receipt", pay: "wallet", gst: "scale", proc: "cart", tax: "users", inv: "box", close: "report", mkt: "trend" };
+export const AREA_ICON = { rec: "receipt", pay: "wallet", gst: "scale", proc: "cart", tax: "users", inv: "box", close: "report", mkt: "trend",
+  dues: "receipt", billing: "file", vendors: "wallet", contracts: "users", utilities: "bolt", funds: "building", compliance: "checkc" };
 export const areaOf = (uc) => UC[uc]?.area || (AREAS || []).find((a) => a[2].includes(uc))?.[0] || "rec";
 export const hueOfArea = (id) => AREA_HUE[id] || SPARE[Math.max(0, (AREAS || []).findIndex((a) => a[0] === id)) % SPARE.length];
 export const hueOf = (uc) => hueOfArea(areaOf(uc));

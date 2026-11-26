@@ -1,7 +1,7 @@
 "use client";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AREAS, UC, compute, findingsOf, freshState, inr, projected, seedFull, seedMeta, selectCompany } from "@/lib/engine";
+import { AREAS, UC, compute, findingsOf, freshState, inr, projected, seedFull, seedMeta, selectCompany, LB } from "@/lib/engine";
 import { COMPANIES, DEFAULT_COMPANY, companyMeta, loadCompany, reportUrl } from "@/lib/companies";
 import Hero from "@/components/fx/Hero";
 import Hub from "@/components/fx/Hub";
@@ -109,7 +109,7 @@ function Dashboard() {
     { k: "atStake", l: "At stake", v: inr(K.atStake), d: K.atStake - B.atStake, good: -1, sub0: `${K.total - K.done} open items` },
     { k: "cash", l: "Cash & bank", v: inr(K.cash), d: K.cash - B.cash, good: 1 },
     { k: "dso", l: "DSO", v: days(K.dso), d: K.dso - B.dso, good: -1, fmt: (x) => `${x > 0 ? "+" : "−"}${Math.abs(x).toFixed(1)} days` },
-    { k: "overdue", l: "Overdue from customers", v: inr(K.overdue), d: K.overdue - B.overdue, good: -1 },
+    { k: "overdue", l: LB("overdue", "Overdue from customers"), v: inr(K.overdue), d: K.overdue - B.overdue, good: -1 },
     { k: "value", l: "Saved & risk stopped", v: inr(K.value), d: K.value - B.value, good: 1 },
     { k: "done", l: "Actions approved", v: `${K.done} / ${K.total}`, d: 0, sub: K.done ? `${inr(B.atStake - K.atStake)} actioned` : "Waiting for you" },
   ];
@@ -222,7 +222,7 @@ function Dashboard() {
           <div className="fx-grpl">Reports</div>
           {downloads.map((d) => (
             <a key={d.id} className="fx-tab" href={reportUrl(co, d.filename)} download={d.filename} title={`${d.title} · ${d.covers}`}>
-              <Ic n={d.period === "impact" ? "trend" : d.format === "pdf" ? "file" : "report"} />{d.period === "impact" ? "Impact report" : `${d.format === "pdf" ? "MIS" : "Actionable"} · ${d.period}`}<em><Ic n="download" s={13} /></em>
+              <Ic n={d.period === "impact" ? "trend" : d.format === "pdf" ? "file" : "report"} />{d.short || (d.period === "impact" ? "Impact report" : `${d.format === "pdf" ? "MIS" : "Actionable"} · ${d.period}`)}<em><Ic n="download" s={13} /></em>
             </a>
           ))}
           <div className="fx-sep" />
@@ -310,7 +310,7 @@ function EditDrawer({ state, setState, onClose }) {
           {F({ label: "Receivables (₹)", value: state.inputs.receivables, on: setIn("receivables") })}
           {F({ label: "Net sales, last 90 days (₹)", value: state.inputs.netSales90, on: setIn("netSales90") })}
           {F({ label: "Interest rate on early / late payments (%)", value: state.inputs.interestRate, on: setIn("interestRate") })}
-          <h3>Customer dues by days overdue</h3>
+          <h3>{LB("dues_by_age", "Customer dues by days overdue")}</h3>
           {state.ageing.map((b, i) => F({ label: b.bucket, value: b.amount, on: setAge(i), key: b.bucket }))}
         </div>
         <div className="fx-dact"><button className="fx-btn pri" onClick={onClose}>Done</button></div>
