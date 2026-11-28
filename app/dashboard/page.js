@@ -10,6 +10,7 @@ import CaseFile from "@/components/fx/CaseFile";
 import Palette from "@/components/fx/Palette";
 import Area from "@/components/fx/Area";
 import Impact from "@/components/fx/Impact";
+import Reports from "@/components/fx/Reports";
 import { AREA_ICON, Ic, Tip, areaOf, hueOfArea } from "@/components/fx/ui";
 import "./fx.css";
 
@@ -53,6 +54,7 @@ function Dashboard() {
   const [area, setArea] = useState(null);    // Action Hub area, for companies running more than nine use cases
   const [dlOpen, setDlOpen] = useState(false);
   const [emails, setEmails] = useState(0);
+  const [bizMetric, setBizMetric] = useState("");  // Business Impact opened on one outcome (from a signal)
   const demo = user?.token === "demo";
 
   // ---- who is this? (saved session from the welcome form, or ?demo=1)
@@ -186,15 +188,16 @@ function Dashboard() {
   const goArea = (id, u) => { setView("area"); setArea(id); setAreaUc(u ?? null); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const goView = (v) => { setView(v); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
   const pickUc = (uc) => goHub("todo", areaOf(uc), uc);
-  const onHeroGo = (k) => { if (k === "overview" || k === "impact") { goView(k); return; } goHub(k); };
+  const onHeroGo = (k) => { if (k === "overview" || k === "impact" || k === "reports") { goView(k); return; } goHub(k); };
+  const goBiz = (m) => { setBizMetric(m || ""); goView("impact"); };
   const downloads = companyMeta(co).downloads;
   const initials = (user.name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const openN = K.total - K.done;
   const areaCount = (ucs) => list.filter((f) => ucs.includes(f.uc) && !state.approved[f.id]).length;
-  const sections = [{ id: "hub", label: "Action Hub", icon: "inbox" }, { id: "impact", label: "Impact report", icon: "trend" }, { id: "overview", label: "Overview", icon: "grid" }]
+  const sections = [{ id: "overview", label: "Financial Overview", icon: "grid" }, { id: "impact", label: "Business Impact", icon: "trend" }, { id: "hub", label: "Action Hub", icon: "inbox" }, { id: "reports", label: "Reports", icon: "report" }]
     .concat((AREAS || []).map(([id, label]) => ({ id: "area:" + id, label, icon: AREA_ICON[id] || "grid" })));
-  const onSection = (x) => { if (x.id === "hub") goHub("todo"); else if (x.id === "overview" || x.id === "impact") setView(x.id); else goArea(x.id.slice(5)); };
-  const title = view === "overview" ? "Overview" : view === "impact" ? "Impact report" : view === "area" ? (AREAS || []).find((a) => a[0] === area)?.[1] : hubUc ? UC[hubUc]?.name : area ? (AREAS || []).find((a) => a[0] === area)?.[1] : "Action Hub";
+  const onSection = (x) => { if (x.id === "hub") goHub("todo"); else if (x.id === "overview" || x.id === "impact" || x.id === "reports") goView(x.id); else goArea(x.id.slice(5)); };
+  const title = view === "overview" ? "Financial Overview" : view === "impact" ? "Business Impact" : view === "reports" ? "Reports" : view === "area" ? (AREAS || []).find((a) => a[0] === area)?.[1] : hubUc ? UC[hubUc]?.name : area ? (AREAS || []).find((a) => a[0] === area)?.[1] : "Action Hub";
 
   return (
     <div className="fx">
@@ -206,9 +209,9 @@ function Dashboard() {
           </select>
         </label>
         <nav className="fx-nav">
+          <button className="fx-tab" aria-current={view === "overview" ? "page" : undefined} onClick={() => goView("overview")}><Ic n="grid" />Financial Overview</button>
+          <button className="fx-tab" aria-current={view === "impact" ? "page" : undefined} onClick={() => goBiz("")}><Ic n="trend" />Business Impact</button>
           <button className={`fx-tab ${openN ? "hot" : ""}`} aria-current={view === "hub" && !area && !hubUc ? "page" : undefined} onClick={() => goHub()}><Ic n="inbox" />Action Hub<em className="num">{openN}</em></button>
-          <button className="fx-tab" aria-current={view === "impact" ? "page" : undefined} onClick={() => goView("impact")}><Ic n="trend" />Impact report</button>
-          <button className="fx-tab" aria-current={view === "overview" ? "page" : undefined} onClick={() => goView("overview")}><Ic n="grid" />Overview</button>
           {AREAS && <div className="fx-grpl">Business areas</div>}
           {(AREAS || []).map(([id, label, ucs]) => {
             const n = areaCount(ucs);
@@ -219,12 +222,7 @@ function Dashboard() {
             );
           })}
           <div className="fx-sep" />
-          <div className="fx-grpl">Reports</div>
-          {downloads.map((d) => (
-            <a key={d.id} className="fx-tab" href={reportUrl(co, d.filename)} download={d.filename} title={`${d.title} · ${d.covers}`}>
-              <Ic n={d.period === "impact" ? "trend" : d.format === "pdf" ? "file" : "report"} />{d.short || (d.period === "impact" ? "Impact report" : `${d.format === "pdf" ? "MIS" : "Actionable"} · ${d.period}`)}<em><Ic n="download" s={13} /></em>
-            </a>
-          ))}
+          <button className="fx-tab" aria-current={view === "reports" ? "page" : undefined} onClick={() => goView("reports")}><Ic n="report" />Reports<em className="num">{downloads.length}</em></button>
           <div className="fx-sep" />
           <button className="fx-tab" onClick={() => setEditing(true)}><Ic n="sliders" />Edit numbers</button>
           <button className="fx-tab" onClick={reset}><Ic n="reset" />Reset to Tally</button>
@@ -241,7 +239,7 @@ function Dashboard() {
 
       <div className="fx-stage">
         <header className="fx-top"><div className="in">
-          <div className="fx-crumb"><h1>{title}</h1><span>{seedMeta.company} · {view === "overview" ? "where the money stands" : view === "impact" ? "what the actions achieved" : view === "area" ? "each check: results, forecast and the actions" : "decisions, approvals and their effect"}</span></div>
+          <div className="fx-crumb"><h1>{title}</h1><span>{seedMeta.company} · {view === "overview" ? "where the money stands, and what needs attention" : view === "impact" ? "the value the actions delivered, with the evidence" : view === "reports" ? "MIS, action and impact reports" : view === "area" ? "each check: results, forecast and the actions" : "decisions, approvals and their effect"}</span></div>
           <button className="fx-kbtn" onClick={() => setKp(true)} aria-label="Search (Ctrl+K)"><Ic n="search" /><span className="lbl">Search parties, findings…</span><kbd>Ctrl K</kbd></button>
           <div className="fx-menu">
             <button className="fx-btn pri sm" onClick={() => setDlOpen(!dlOpen)} aria-expanded={dlOpen}><Ic n="download" s={15} /><span className="lbl">Download reports</span></button>
@@ -262,17 +260,19 @@ function Dashboard() {
         </div></header>
 
         <main className="fx-wrap">
-          {view !== "area" && <Hero state={state} now={now} base={base} proj={proj} flash={flash} showFlow={view === "hub"} onGo={onHeroGo} scope={view === "hub" ? { area, uc: hubUc } : {}} />}
+          {view === "hub" && <Hero state={state} now={now} base={base} proj={proj} flash={flash} showFlow={view === "hub"} onGo={onHeroGo} scope={view === "hub" ? { area, uc: hubUc } : {}} />}
           {view === "hub" ? (
             <Hub state={state} list={list} now={now} seg={seg} setSeg={setSeg} area={area} setArea={setArea} uc={hubUc} setUc={(u) => { setHubUc(u); if (u) setTab(u); }}
               onOpen={(f) => setOpen(f)} onEdit={editAmount} onUndo={undo} onApproveAll={approveAll} />
           ) : view === "area" ? (
             <Area key={area} state={state} list={list} now={now} base={base} area={area} uc={areaUc} setUc={setAreaUc} onHub={(u) => goHub("todo", areaOf(u), u)} />
           ) : view === "impact" ? (
-            <Impact state={state} now={now} base={base} proj={proj} list={list} co={co} downloads={downloads} emails={emails} onOpen={(f) => setOpen(f)} />
+            <Impact key={co + ":" + bizMetric} state={state} now={now} base={base} proj={proj} list={list} co={co} downloads={downloads} emails={emails} onOpen={(f) => setOpen(f)} say={say} metric0={bizMetric} />
+          ) : view === "reports" ? (
+            <Reports co={co} state={state} list={list} now={now} base={base} downloads={downloads} onGo={(v) => (v === "impact" ? goBiz("") : goView(v))} say={say} />
           ) : (
-            <Board state={state} now={now} base={base} proj={proj} onOpen={(f) => setOpen(f)} onEdit={editAmount} onUndo={undo}
-              onPickArea={(id) => goArea(id)} onPickUc={pickUc} onSeeAll={() => goHub("todo")} />
+            <Board co={co} state={state} list={list} now={now} base={base} proj={proj} onOpen={(f) => setOpen(f)} onEdit={editAmount} onUndo={undo}
+              onPickArea={(id) => goArea(id)} onPickUc={pickUc} onSeeAll={() => goHub("todo")} onBiz={goBiz} say={say} />
           )}
           <p className="fx-legal">Live data from Tally through FlowIQ Automation. Emails go only to your own address{user.email ? ` (${user.email})` : ""}.</p>
         </main>

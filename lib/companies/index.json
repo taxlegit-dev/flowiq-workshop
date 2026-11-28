@@ -59,6 +59,26 @@
     "built_at": "2026-11-18T05:48:45"
    },
    {
+    "id": "action_report_weekly",
+    "title": "Action report - Weekly",
+    "group": "Action report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Vardhan_Home_Industrial_Action_report_Weekly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:06"
+   },
+   {
+    "id": "action_report_monthly",
+    "title": "Action report - Monthly",
+    "group": "Action report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Vardhan_Home_Industrial_Action_report_Monthly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:07"
+   },
+   {
     "id": "impact_report",
     "title": "Impact report - Full report (Excel)",
     "group": "Impact report (Excel)",
@@ -131,6 +151,26 @@
     "built_at": "2026-11-19T12:32:26"
    },
    {
+    "id": "action_report_weekly",
+    "title": "Action report - Weekly",
+    "group": "Action report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Kaveri_Pumps_Valves_Action_report_Weekly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:09"
+   },
+   {
+    "id": "action_report_monthly",
+    "title": "Action report - Monthly",
+    "group": "Action report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Kaveri_Pumps_Valves_Action_report_Monthly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:09"
+   },
+   {
     "id": "impact_report",
     "title": "Impact report - Full report (Excel)",
     "group": "Impact report (Excel)",
@@ -201,6 +241,26 @@
     "filename": "Aanya_Kitchen_Home_Actionable_report_Monthly_2026-11-18.xlsx",
     "covers": "20-Oct-2026 to 18-Nov-2026",
     "built_at": "2026-11-18T13:14:34"
+   },
+   {
+    "id": "action_report_weekly",
+    "title": "Action report - Weekly",
+    "group": "Action report (PDF)",
+    "period": "weekly",
+    "format": "pdf",
+    "filename": "Aanya_Kitchen_Home_Action_report_Weekly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:05"
+   },
+   {
+    "id": "action_report_monthly",
+    "title": "Action report - Monthly",
+    "group": "Action report (PDF)",
+    "period": "monthly",
+    "format": "pdf",
+    "filename": "Aanya_Kitchen_Home_Action_report_Monthly_2026-11-26.pdf",
+    "covers": "26 Nov 2026 to 26 Nov 2026",
+    "built_at": "2026-11-26T17:26:06"
    },
    {
     "id": "impact_report",
